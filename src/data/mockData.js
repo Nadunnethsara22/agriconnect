@@ -1,0 +1,521 @@
+// Sri Lankan districts
+export const SRI_LANKA_DISTRICTS = [
+  "Ampara", "Anuradhapura", "Badulla", "Batticaloa", "Colombo",
+  "Galle", "Gampaha", "Hambantota", "Jaffna", "Kalutara",
+  "Kandy", "Kegalle", "Kilinochchi", "Kurunegala", "Mannar",
+  "Matale", "Matara", "Monaragala", "Mullaitivu", "Nuwara Eliya",
+  "Polonnaruwa", "Puttalam", "Ratnapura", "Trincomalee", "Vavuniya"
+];
+
+// Major Economic Centres in Sri Lanka
+export const ECONOMIC_CENTRES = [
+  { id: "dambulla", name: "Dambulla Dedicated Economic Centre", location: "Central Province" },
+  { id: "manning", name: "Peliyagoda New Manning Market", location: "Western Province" },
+  { id: "keppetipola", name: "Keppetipola Dedicated Economic Centre", location: "Uva Province" },
+  { id: "meegoda", name: "Meegoda Dedicated Economic Centre", location: "Western Province" },
+  { id: "norochcholai", name: "Norochcholai Economic Centre", location: "North Western Province" },
+  { id: "vavuniya", name: "Vavuniya Economic Centre", location: "Northern Province" }
+];
+
+// Product Categories
+export const CATEGORIES = [
+  { id: "vegetables", name: "Upcountry & Lowcountry Vegetables", sinhala: "එළවළු", icon: "Carrot" },
+  { id: "fruits", name: "Tropical Fruits", sinhala: "පළතුරු", icon: "Apple" },
+  { id: "grains", name: "Paddy & Grains", sinhala: "ධාන්‍ය සහ වී", icon: "Wheat" },
+  { id: "spices", name: "Ceylon Spices & Herbs", sinhala: "කුළුබඩු", icon: "Sparkles" },
+  { id: "coconut", name: "Coconut & Plantation", sinhala: "පොල් සහ වැවිලි බෝග", icon: "TreePalm" }
+];
+
+// Initial Realistic Agricultural Products
+export const INITIAL_PRODUCTS = [
+  {
+    id: "prod-1",
+    farmerId: "farmer-1",
+    farmerName: "Sunil Bandara",
+    farmerPhone: "+94 77 345 6789",
+    farmName: "Green Valley Highland Farms",
+    farmerRating: 4.9,
+    farmerReviews: 38,
+    name: "Nuwara Eliya Fresh Carrots",
+    sinhalaName: "නුවරඑළිය නැවුම් කැරට්",
+    category: "vegetables",
+    variety: "Nantes Grade A (Export Quality)",
+    pricePerKg: 380,
+    wholesalePrice: 350, // for > 200kg
+    stockKg: 1500,
+    minOrderKg: 50,
+    unit: "kg",
+    district: "Nuwara Eliya",
+    location: "Kandapola, Nuwara Eliya",
+    harvestDate: "2026-11-05",
+    isOrganic: true,
+    description: "Crisp, sweet, and soil-washed premium highland carrots harvested yesterday morning from volcanic-rich soil in Kandapola. Ideal for supermarket distribution, wholesale buyers, and hotel chains.",
+    image: "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?auto=format&fit=crop&w=800&q=80",
+    status: "available",
+    createdAt: "2026-11-05T08:00:00Z"
+  },
+  {
+    id: "prod-2",
+    farmerId: "farmer-2",
+    farmerName: "K. M. Jayasinghe",
+    farmerPhone: "+94 71 892 1144",
+    farmName: "Rajarata Organic Paddy Lands",
+    farmerRating: 4.8,
+    farmerReviews: 52,
+    name: "Anuradhapura Keeri Samba Paddy",
+    sinhalaName: "අනුරාධපුර කීරි සම්බා වී",
+    category: "grains",
+    variety: "Keeri Samba (BG 360) New Harvest",
+    pricePerKg: 135,
+    wholesalePrice: 128,
+    stockKg: 8500,
+    minOrderKg: 500,
+    unit: "kg",
+    district: "Anuradhapura",
+    location: "Thambuttegama, Anuradhapura",
+    harvestDate: "2026-11-03",
+    isOrganic: false,
+    description: "Well-dried premium Keeri Samba paddy with standard 13% moisture level. High milling yield, aroma and unbroken grain percentage. Delivery can be arranged with local lorries.",
+    image: "https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=800&q=80",
+    status: "available",
+    createdAt: "2026-11-03T11:30:00Z"
+  },
+  {
+    id: "prod-3",
+    farmerId: "farmer-3",
+    farmerName: "Gayantha Wickramasinghe",
+    farmerPhone: "+94 78 512 9901",
+    farmName: "Dambulla Harvest Co-Op",
+    farmerRating: 4.7,
+    farmerReviews: 29,
+    name: "Dambulla Big Onions (Grade 1)",
+    sinhalaName: "දඹුල්ල ලොකු ළූණු",
+    category: "vegetables",
+    variety: "Local Hybrid Grade 1",
+    pricePerKg: 310,
+    wholesalePrice: 290,
+    stockKg: 4200,
+    minOrderKg: 100,
+    unit: "kg",
+    district: "Matale",
+    location: "Kandalama Road, Dambulla",
+    harvestDate: "2026-11-04",
+    isOrganic: false,
+    description: "Cured and sun-dried Dambulla local big onions with thick skin and extended shelf life (up to 45 days). Direct supply directly from Dambulla farmer collective without middle broker cuts.",
+    image: "https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?auto=format&fit=crop&w=800&q=80",
+    status: "available",
+    createdAt: "2026-11-04T09:15:00Z"
+  },
+  {
+    id: "prod-4",
+    farmerId: "farmer-4",
+    farmerName: "R. Theivendran",
+    farmerPhone: "+94 77 123 4455",
+    farmName: "Vadamarachchi Red Onion Farms",
+    farmerRating: 5.0,
+    farmerReviews: 44,
+    name: "Jaffna Red Onions (Sinna Vengayam)",
+    sinhalaName: "යාපනය රතු ළූණු",
+    category: "vegetables",
+    variety: "Jaffna Local Red (Strong Pungency)",
+    pricePerKg: 460,
+    wholesalePrice: 430,
+    stockKg: 2200,
+    minOrderKg: 80,
+    unit: "kg",
+    district: "Jaffna",
+    location: "Thirunelveli, Jaffna",
+    harvestDate: "2026-11-02",
+    isOrganic: true,
+    description: "Authentic Jaffna red onions famous for rich color, firm bulbs, and intense aroma. Carefully harvested and graded. Packed in 20kg aerated mesh sacks.",
+    image: "https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&w=800&q=80",
+    status: "available",
+    createdAt: "2026-11-02T14:20:00Z"
+  },
+  {
+    id: "prod-5",
+    farmerId: "farmer-5",
+    farmerName: "Chaminda Karunaratne",
+    farmerPhone: "+94 70 234 5678",
+    farmName: "Walawe Valley Tropical Agro",
+    farmerRating: 4.8,
+    farmerReviews: 21,
+    name: "Embilipitiya Red Lady Papaya",
+    sinhalaName: "ඇඹිලිපිටිය රෙඩ් ලේඩි පැපොල්",
+    category: "fruits",
+    variety: "Red Lady F1 Hybrid",
+    pricePerKg: 190,
+    wholesalePrice: 170,
+    stockKg: 1800,
+    minOrderKg: 100,
+    unit: "kg",
+    district: "Ratnapura",
+    location: "Embilipitiya, Ratnapura",
+    harvestDate: "2026-11-05",
+    isOrganic: true,
+    description: "Deep red flesh, sweet brix rating 12+, thick skin resistant to transport bruising. Harvested at semi-ripe stage (color break 2) so they arrive in peak condition in Colombo and suburbs.",
+    image: "https://images.unsplash.com/photo-1517282009859-f000ec3b26fe?auto=format&fit=crop&w=800&q=80",
+    status: "available",
+    createdAt: "2026-11-05T12:00:00Z"
+  },
+  {
+    id: "prod-6",
+    farmerId: "farmer-1",
+    farmerName: "Sunil Bandara",
+    farmerPhone: "+94 77 345 6789",
+    farmName: "Green Valley Highland Farms",
+    farmerRating: 4.9,
+    farmerReviews: 38,
+    name: "Welimada Fresh Leeks",
+    sinhalaName: "වැලිමඩ නැවුම් ලීක්ස්",
+    category: "vegetables",
+    variety: "Highland Giant Leeks",
+    pricePerKg: 260,
+    wholesalePrice: 240,
+    stockKg: 950,
+    minOrderKg: 40,
+    unit: "kg",
+    district: "Badulla",
+    location: "Welimada, Badulla",
+    harvestDate: "2026-11-06",
+    isOrganic: true,
+    description: "Long white stem with fresh vibrant dark green tops. Freshly pulled and bundled in clean 10kg bunches. Ideal for restaurants, hotels, and vegetable retailers.",
+    image: "https://images.unsplash.com/photo-1524179091875-bf99a9a6af57?auto=format&fit=crop&w=800&q=80",
+    status: "available",
+    createdAt: "2026-11-06T06:30:00Z"
+  },
+  {
+    id: "prod-7",
+    farmerId: "farmer-6",
+    farmerName: "Lionel Samarasinghe",
+    farmerPhone: "+94 76 778 8990",
+    farmName: "Wayamba Coconut & Spice Estate",
+    farmerRating: 4.9,
+    farmerReviews: 63,
+    name: "Kurunegala Fresh Coconut (Weligama Grade A)",
+    sinhalaName: "කුරුණෑගල පොල් (විශාල ගෙඩි)",
+    category: "coconut",
+    variety: "Tall Coconut (High Kernel & Oil)",
+    pricePerKg: 110, // price per nut
+    wholesalePrice: 98,
+    stockKg: 3500, // nuts
+    minOrderKg: 200,
+    unit: "nuts",
+    district: "Kurunegala",
+    location: "Kuliyapitiya, Kurunegala",
+    harvestDate: "2026-11-01",
+    isOrganic: true,
+    description: "Large heavy coconuts with thick meat kernel, harvested from traditional organic coconut grove. Inspected and de-husked or husked according to buyer request.",
+    image: "https://images.unsplash.com/photo-1544434981-e23a483a936a?auto=format&fit=crop&w=800&q=80",
+    status: "available",
+    createdAt: "2026-11-01T15:00:00Z"
+  },
+  {
+    id: "prod-8",
+    farmerId: "farmer-7",
+    farmerName: "Anura Senanayake",
+    farmerPhone: "+94 72 443 2190",
+    farmName: "Dumbara Valley Spices",
+    farmerRating: 5.0,
+    farmerReviews: 19,
+    name: "Ceylon Organic Black Pepper (Grade 1 - 550GL)",
+    sinhalaName: "ලංකා ගම්මිරිස් (Grade 1)",
+    category: "spices",
+    variety: "Ceylon Black Pepper 550g/l density",
+    pricePerKg: 2650,
+    wholesalePrice: 2500,
+    stockKg: 650,
+    minOrderKg: 15,
+    unit: "kg",
+    district: "Kandy",
+    location: "Teldeniya, Kandy",
+    harvestDate: "2026-10-28",
+    isOrganic: true,
+    description: "Export quality sun-dried black pepper berries with high piperine content and intense pungency. Cleaned with air gravity separators, free from mold or foreign matter.",
+    image: "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=800&q=80",
+    status: "available",
+    createdAt: "2026-10-28T16:00:00Z"
+  }
+];
+
+// Initial Buyer Purchase Requests
+export const INITIAL_BUYER_REQUESTS = [
+  {
+    id: "req-1",
+    productId: "prod-1",
+    productName: "Nuwara Eliya Fresh Carrots",
+    farmerId: "farmer-1",
+    farmerName: "Sunil Bandara",
+    buyerId: "buyer-1",
+    buyerName: "Priyantha Silva",
+    buyerBusiness: "Colombo Fresh Supermarkets Network",
+    buyerPhone: "+94 77 987 6543",
+    buyerDistrict: "Colombo",
+    quantity: 400,
+    unit: "kg",
+    offeredPricePerKg: 360,
+    totalOfferLKR: 144000,
+    deliveryDate: "2026-11-10",
+    deliveryAddress: "Central Distribution Center, Peliyagoda, Kelaniya",
+    status: "pending", // pending, accepted, declined, completed
+    note: "Need 400kg carrots washed and packed in 20kg crates. Can arrange our own refrigerated lorry pickup if ready by Sunday.",
+    createdAt: "2026-11-06T10:15:00Z"
+  },
+  {
+    id: "req-2",
+    productId: "prod-6",
+    productName: "Welimada Fresh Leeks",
+    farmerId: "farmer-1",
+    farmerName: "Sunil Bandara",
+    buyerId: "buyer-2",
+    buyerName: "Mohamed Rauf",
+    buyerBusiness: "Ceylinco Grand Catering Services",
+    buyerPhone: "+94 71 445 6789",
+    buyerDistrict: "Kandy",
+    quantity: 150,
+    unit: "kg",
+    offeredPricePerKg: 245,
+    totalOfferLKR: 36750,
+    deliveryDate: "2026-11-08",
+    deliveryAddress: "No. 45 Peradeniya Road, Kandy",
+    status: "accepted",
+    note: "Regular weekly order for wedding banquet catering. Quality must be uniform.",
+    createdAt: "2026-11-05T14:40:00Z"
+  },
+  {
+    id: "req-3",
+    productId: "prod-3",
+    productName: "Dambulla Big Onions (Grade 1)",
+    farmerId: "farmer-3",
+    farmerName: "Gayantha Wickramasinghe",
+    buyerId: "buyer-1",
+    buyerName: "Priyantha Silva",
+    buyerBusiness: "Colombo Fresh Supermarkets Network",
+    buyerPhone: "+94 77 987 6543",
+    buyerDistrict: "Colombo",
+    quantity: 1200,
+    unit: "kg",
+    offeredPricePerKg: 295,
+    totalOfferLKR: 354000,
+    deliveryDate: "2026-11-12",
+    deliveryAddress: "Meegoda Wholesale Depot",
+    status: "pending",
+    note: "Please confirm moisture dryness and sack sizes.",
+    createdAt: "2026-11-06T12:00:00Z"
+  }
+];
+
+// Public Wanted / Buyer Requirement Posts (Buyers looking for crops)
+export const INITIAL_WANTED_POSTS = [
+  {
+    id: "wanted-1",
+    buyerId: "buyer-1",
+    buyerName: "Priyantha Silva",
+    buyerBusiness: "Colombo Fresh Supermarkets",
+    buyerPhone: "+94 77 987 6543",
+    buyerDistrict: "Colombo",
+    cropNeeded: "Green Chillies (අමු මිරිස්)",
+    targetQuantity: 800,
+    unit: "kg",
+    budgetPriceLKR: 650,
+    requiredByDate: "2026-11-14",
+    preferredDistricts: ["Matale", "Anuradhapura", "Kurunegala"],
+    description: "Looking for fresh green chillies (MICH 1 or MI 2 variety), dark green, firm, unblemished. Immediate cash payment upon delivery or collection.",
+    status: "active",
+    responsesCount: 4,
+    createdAt: "2026-11-05T16:00:00Z"
+  },
+  {
+    id: "wanted-2",
+    buyerId: "buyer-3",
+    buyerName: "Niroshan Perera",
+    buyerBusiness: "Ceylon Agro Exports (Pvt) Ltd",
+    buyerPhone: "+94 75 332 1199",
+    buyerDistrict: "Gampaha",
+    cropNeeded: "Organic Ceylon Cinnamon Quills (ALBA or C5 Special)",
+    targetQuantity: 300,
+    unit: "kg",
+    budgetPriceLKR: 4800,
+    requiredByDate: "2026-11-20",
+    preferredDistricts: ["Galle", "Matara", "Kalutara"],
+    description: "Export order to EU. Requires certified sulfur-free, high aroma quills with less than 12% moisture. Certificates appreciated.",
+    status: "active",
+    responsesCount: 2,
+    createdAt: "2026-11-04T09:00:00Z"
+  },
+  {
+    id: "wanted-3",
+    buyerId: "buyer-2",
+    buyerName: "Mohamed Rauf",
+    buyerBusiness: "Ceylinco Grand Catering",
+    buyerPhone: "+94 71 445 6789",
+    buyerDistrict: "Kandy",
+    cropNeeded: "Salad Tomatoes & Plum Tomatoes (තක්කාලි)",
+    targetQuantity: 500,
+    unit: "kg",
+    budgetPriceLKR: 280,
+    requiredByDate: "2026-11-11",
+    preferredDistricts: ["Badulla", "Matale", "Nuwara Eliya"],
+    description: "Need medium to large tomatoes for catering preparations. Firmness is essential.",
+    status: "active",
+    responsesCount: 6,
+    createdAt: "2026-11-06T08:30:00Z"
+  }
+];
+
+// Real-world Sri Lanka Economic Centre wholesale price benchmark index
+export const ECONOMIC_CENTRE_PRICES = [
+  {
+    crop: "Carrots (කැරට්)",
+    dambullaWholesale: 410,
+    manningWholesale: 440,
+    keppetipolaWholesale: 375,
+    farmerDirectAvg: 380,
+    retailAverage: 520,
+    trend: "down", // up, down, stable
+    trendPercent: -4.5,
+    history: [
+      { day: "Mon", dambulla: 430, farmerDirect: 390 },
+      { day: "Tue", dambulla: 425, farmerDirect: 385 },
+      { day: "Wed", dambulla: 420, farmerDirect: 380 },
+      { day: "Thu", dambulla: 415, farmerDirect: 380 },
+      { day: "Fri", dambulla: 410, farmerDirect: 380 },
+      { day: "Sat", dambulla: 410, farmerDirect: 380 }
+    ]
+  },
+  {
+    crop: "Leeks (ලීක්ස්)",
+    dambullaWholesale: 280,
+    manningWholesale: 310,
+    keppetipolaWholesale: 250,
+    farmerDirectAvg: 260,
+    retailAverage: 380,
+    trend: "up",
+    trendPercent: 5.2,
+    history: [
+      { day: "Mon", dambulla: 250, farmerDirect: 235 },
+      { day: "Tue", dambulla: 260, farmerDirect: 245 },
+      { day: "Wed", dambulla: 270, farmerDirect: 250 },
+      { day: "Thu", dambulla: 275, farmerDirect: 255 },
+      { day: "Fri", dambulla: 280, farmerDirect: 260 },
+      { day: "Sat", dambulla: 280, farmerDirect: 260 }
+    ]
+  },
+  {
+    crop: "Big Onions (ලොකු ළූණු)",
+    dambullaWholesale: 330,
+    manningWholesale: 360,
+    keppetipolaWholesale: 340,
+    farmerDirectAvg: 310,
+    retailAverage: 420,
+    trend: "stable",
+    trendPercent: 0.8,
+    history: [
+      { day: "Mon", dambulla: 325, farmerDirect: 305 },
+      { day: "Tue", dambulla: 330, farmerDirect: 310 },
+      { day: "Wed", dambulla: 330, farmerDirect: 310 },
+      { day: "Thu", dambulla: 330, farmerDirect: 310 },
+      { day: "Fri", dambulla: 330, farmerDirect: 310 },
+      { day: "Sat", dambulla: 330, farmerDirect: 310 }
+    ]
+  },
+  {
+    crop: "Green Chillies (අමු මිරිස්)",
+    dambullaWholesale: 720,
+    manningWholesale: 780,
+    keppetipolaWholesale: 700,
+    farmerDirectAvg: 680,
+    retailAverage: 920,
+    trend: "up",
+    trendPercent: 12.5,
+    history: [
+      { day: "Mon", dambulla: 620, farmerDirect: 590 },
+      { day: "Tue", dambulla: 650, farmerDirect: 620 },
+      { day: "Wed", dambulla: 680, farmerDirect: 650 },
+      { day: "Thu", dambulla: 700, farmerDirect: 660 },
+      { day: "Fri", dambulla: 720, farmerDirect: 680 },
+      { day: "Sat", dambulla: 720, farmerDirect: 680 }
+    ]
+  },
+  {
+    crop: "Tomatoes (තක්කාලි)",
+    dambullaWholesale: 320,
+    manningWholesale: 360,
+    keppetipolaWholesale: 300,
+    farmerDirectAvg: 290,
+    retailAverage: 450,
+    trend: "down",
+    trendPercent: -8.0,
+    history: [
+      { day: "Mon", dambulla: 360, farmerDirect: 330 },
+      { day: "Tue", dambulla: 350, farmerDirect: 320 },
+      { day: "Wed", dambulla: 340, farmerDirect: 310 },
+      { day: "Thu", dambulla: 330, farmerDirect: 300 },
+      { day: "Fri", dambulla: 320, farmerDirect: 290 },
+      { day: "Sat", dambulla: 320, farmerDirect: 290 }
+    ]
+  },
+  {
+    crop: "Keeri Samba Paddy (කීරි සම්බා වී)",
+    dambullaWholesale: 142,
+    manningWholesale: 155,
+    keppetipolaWholesale: 140,
+    farmerDirectAvg: 135,
+    retailAverage: 240, // milled rice
+    trend: "stable",
+    trendPercent: 1.2,
+    history: [
+      { day: "Mon", dambulla: 140, farmerDirect: 132 },
+      { day: "Tue", dambulla: 140, farmerDirect: 133 },
+      { day: "Wed", dambulla: 141, farmerDirect: 134 },
+      { day: "Thu", dambulla: 141, farmerDirect: 134 },
+      { day: "Fri", dambulla: 142, farmerDirect: 135 },
+      { day: "Sat", dambulla: 142, farmerDirect: 135 }
+    ]
+  }
+];
+
+// Pre-seeded Demo Users
+export const DEMO_USERS = {
+  farmer: {
+    uid: "farmer-1",
+    displayName: "Sunil Bandara",
+    email: "sunil.farmer@agriconnect.lk",
+    role: "farmer",
+    phone: "+94 77 345 6789",
+    district: "Nuwara Eliya",
+    location: "Kandapola, Nuwara Eliya",
+    farmName: "Green Valley Highland Farms",
+    mainCrops: "Carrots, Leeks, Potatoes, Cabbage",
+    bio: "Agricultural producer with 18 years of highland vegetable cultivation. Committed to GAP-certified organic fertilization practices.",
+    rating: 4.9,
+    completedDeals: 64,
+    avatar: "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=300&q=80"
+  },
+  buyer: {
+    uid: "buyer-1",
+    displayName: "Priyantha Silva",
+    email: "priyantha.buyer@freshmarkets.lk",
+    role: "buyer",
+    phone: "+94 77 987 6543",
+    district: "Colombo",
+    businessName: "Colombo Fresh Supermarkets Network",
+    buyerType: "Supermarket Chain / Wholesale",
+    location: "Peliyagoda & Pettah, Colombo",
+    bio: "Head of Fresh Produce Procurement supplying 14 supermarket branches and restaurant chains in Western Province.",
+    rating: 4.8,
+    purchasesCount: 112,
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80"
+  },
+  admin: {
+    uid: "admin-1",
+    displayName: "Kavinda Fernando",
+    email: "admin@agriconnect.lk",
+    role: "admin",
+    phone: "+94 11 286 5432",
+    district: "Colombo",
+    designation: "Economic Centre Market Price Analyst",
+    bio: "Agricultural intelligence officer in charge of daily economic centre wholesale pricing and market analytics.",
+    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80"
+  }
+};
