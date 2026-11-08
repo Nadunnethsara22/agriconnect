@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { 
   FileText, 
   Clock, 
@@ -22,14 +22,18 @@ import { SRI_LANKA_DISTRICTS } from "../data/mockData";
 export default function BuyerRequests({ setActivePage }) {
   const { user, isFarmer, isBuyer, switchRole } = useAuth();
   const { 
+    products,
     buyerRequests, 
     wantedPosts, 
     updateRequestStatus, 
-    postWantedRequest 
+    postWantedRequest,
+    sendPurchaseRequest
   } = useMarketplace();
 
   const [activeTab, setActiveTab] = useState(isFarmer ? "received" : "my-orders"); // 'my-orders', 'received', 'wanted-board'
   const [wantedModalOpen, setWantedModalOpen] = useState(false);
+  const [orderModalOpen, setOrderModalOpen] = useState(false);
+  const [notification, setNotification] = useState(null);
 
   // New Wanted Post Form State
   const [newWanted, setNewWanted] = useState({
@@ -42,28 +46,129 @@ export default function BuyerRequests({ setActivePage }) {
     description: ""
   });
 
+  // Direct Purchase Request State
+  const [newOrder, setNewOrder] = useState({
+    productId: "",
+    productName: "",
+    farmerId: "",
+    farmerName: "",
+    farmerPhone: "+94 77 345 6789",
+    quantity: 100,
+    unit: "kg",
+    offeredPricePerKg: "",
+    deliveryDate: new Date(Date.now() + 86400000 * 3).toISOString().split('T')[0],
+    deliveryAddress: user?.district ? `${user.district} Wholesale Depot` : "Colombo Central Wholesale Market",
+    note: ""
+  });
+
+  // Auto-dismiss notification after 5s
+  useEffect(() => {
+    if (notification) {
+      const timer = setTimeout(() => setNotification(null), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [notification]);
+
   // Filter requests
   const mySentRequests = buyerRequests.filter(
-    r => r.buyerId === user?.uid || r.buyerId === "buyer-1" || (!user?.uid && r.buyerId === "buyer-1")
+    r => r.buyerId === user?.uid || 
+         r.buyerId === "buyer-1" || 
+         (!user?.uid && r.buyerId === "buyer-1") ||
+         (user?.email && r.buyerEmail === user.email) ||
+         (user?.displayName && r.buyerName?.toLowerCase() === user.displayName?.toLowerCase())
   );
 
   const receivedRequests = buyerRequests.filter(
     r => r.farmerId === user?.uid || r.farmerId === "farmer-1" || (!user?.uid && r.farmerId === "farmer-1")
   );
 
+  const handleSelectProductForOrder = (productId) => {
+    if (productId === "custom") {
+      setNewOrder(prev => ({
+        ...prev,
+        productId: "custom-" + Date.now(),
+        productName: "",
+        farmerId: "direct-producer",
+        farmerName: "Islandwide Producer",
+        farmerPhone: "+94 77 123 4567",
+        unit: "kg",
+        offeredPricePerKg: ""
+      }));
+      return;
+    }
+
+    const prod = products.find(p => p.id === productId);
+    if (prod) {
+      setNewOrder(prev => ({
+        ...prev,
+        productId: prod.id,
+        productName: prod.name,
+        farmerId: prod.farmerId,
+        farmerName: prod.farmerName,
+        farmerPhone: prod.farmerPhone || "+94 77 345 6789",
+        unit: prod.unit || "kg",
+        offeredPricePerKg: prod.pricePerKg,
+        quantity: prod.minOrderKg || 50
+      }));
+    }
+  };
+
+  const handleCreateOrder = async (e) => {
+    e.preventDefault();
+    if (!newOrder.productName) {
+      setNotification({ type: "error", message: "Please select or specify a crop." });
+      return;
+    }
+
+    try {
+      await sendPurchaseRequest(newOrder);
+      setOrderModalOpen(false);
+      setActiveTab("my-orders");
+      setNotification({
+        type: "success",
+        message: `Purchase request for ${newOrder.quantity}${newOrder.unit} ${newOrder.productName} submitted successfully!`
+      });
+      // Reset
+      setNewOrder({
+        productId: "",
+        productName: "",
+        farmerId: "",
+        farmerName: "",
+        farmerPhone: "+94 77 345 6789",
+        quantity: 100,
+        unit: "kg",
+        offeredPricePerKg: "",
+        deliveryDate: new Date(Date.now() + 86400000 * 3).toISOString().split('T')[0],
+        deliveryAddress: user?.district ? `${user.district} Wholesale Depot` : "Colombo Central Wholesale Market",
+        note: ""
+      });
+    } catch (err) {
+      setNotification({ type: "error", message: "Failed to dispatch request. Please try again." });
+    }
+  };
+
   const handleCreateWanted = async (e) => {
     e.preventDefault();
-    await postWantedRequest(newWanted);
-    setWantedModalOpen(false);
-    setNewWanted({
-      cropNeeded: "",
-      targetQuantity: "",
-      unit: "kg",
-      budgetPriceLKR: "",
-      requiredByDate: new Date(Date.now() + 86400000 * 5).toISOString().split('T')[0],
-      preferredDistricts: ["Nuwara Eliya"],
-      description: ""
-    });
+    try {
+      await postWantedRequest(newWanted);
+      setWantedModalOpen(false);
+      setActiveTab("wanted-board");
+      setNotification({
+        type: "success",
+        message: `Wanted requirement for ${newWanted.cropNeeded} published to Public Wanted Board!`
+      });
+      setNewWanted({
+        cropNeeded: "",
+        targetQuantity: "",
+        unit: "kg",
+        budgetPriceLKR: "",
+        requiredByDate: new Date(Date.now() + 86400000 * 5).toISOString().split('T')[0],
+        preferredDistricts: ["Nuwara Eliya"],
+        description: ""
+      });
+    } catch (err) {
+      setNotification({ type: "error", message: "Failed to publish requirement. Please try again." });
+    }
   };
 
   return (
@@ -83,23 +188,59 @@ export default function BuyerRequests({ setActivePage }) {
           </p>
         </div>
 
-        <div className="flex items-center space-x-3">
+        <div className="flex flex-wrap items-center gap-2.5">
+          <button
+            onClick={() => {
+              if (products.length > 0 && !newOrder.productName) {
+                handleSelectProductForOrder(products[0].id);
+              }
+              setOrderModalOpen(true);
+            }}
+            className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center space-x-1.5 flex-shrink-0"
+          >
+            <ShoppingBag className="w-4 h-4" />
+            <span>+ Send Purchase Request</span>
+          </button>
+          <button
+            onClick={() => setWantedModalOpen(true)}
+            className="px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center space-x-1.5 flex-shrink-0"
+          >
+            <PlusCircle className="w-4 h-4" />
+            <span>+ Post Wanted Requirement</span>
+          </button>
           <button
             onClick={() => setActivePage("profile")}
             className="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition-all flex items-center space-x-1.5 flex-shrink-0 border border-slate-200"
           >
-            <FileText className="w-4 h-4 text-amber-600" />
-            <span>Edit Buyer Profile</span>
-          </button>
-          <button
-            onClick={() => setWantedModalOpen(true)}
-            className="px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center space-x-2 flex-shrink-0"
-          >
-            <PlusCircle className="w-4 h-4" />
-            <span>+ Post Buying Requirement</span>
+            <FileText className="w-4 h-4 text-slate-600" />
+            <span>Edit Profile</span>
           </button>
         </div>
       </div>
+
+      {/* Notification Toast */}
+      {notification && (
+        <div className={`p-4 rounded-2xl flex items-center justify-between text-xs font-bold animate-fade-in shadow-md ${
+          notification.type === "error" 
+            ? "bg-red-50 text-red-800 border border-red-200" 
+            : "bg-emerald-50 text-emerald-800 border border-emerald-200"
+        }`}>
+          <div className="flex items-center space-x-2">
+            {notification.type === "error" ? (
+              <XCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+            ) : (
+              <CheckCircle className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+            )}
+            <span>{notification.message}</span>
+          </div>
+          <button 
+            onClick={() => setNotification(null)}
+            className="p-1 rounded-lg hover:bg-black/5 text-slate-500"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
 
       {/* Tabs */}
       <div className="flex border-b border-slate-200 space-x-4 text-sm font-semibold">
@@ -143,25 +284,49 @@ export default function BuyerRequests({ setActivePage }) {
       {/* TAB 1: MY SENT PURCHASE ORDERS (BUYER PERSPECTIVE) */}
       {activeTab === "my-orders" && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <p className="text-xs text-slate-500">
               Orders you placed with farmers. Status updates automatically when the farmer accepts or marks completed.
             </p>
+            <button
+              onClick={() => {
+                if (products.length > 0 && !newOrder.productName) {
+                  handleSelectProductForOrder(products[0].id);
+                }
+                setOrderModalOpen(true);
+              }}
+              className="inline-flex items-center space-x-1.5 text-xs font-bold text-emerald-700 hover:text-emerald-800 transition-colors"
+            >
+              <PlusCircle className="w-4 h-4" />
+              <span>+ Place Another Order</span>
+            </button>
           </div>
 
           {mySentRequests.length === 0 ? (
-            <div className="bg-white rounded-3xl p-12 border border-slate-200 text-center space-y-3">
+            <div className="bg-white rounded-3xl p-12 border border-slate-200 text-center space-y-4 shadow-sm">
               <ShoppingBag className="w-12 h-12 text-slate-300 mx-auto" />
               <h3 className="font-bold text-slate-800 text-sm">No Purchase Requests Sent Yet</h3>
               <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                Explore the marketplace and send a purchase offer directly to local vegetable, fruit, or paddy growers.
+                Send a direct purchase offer to a verified farmer or browse the wholesale marketplace.
               </p>
-              <button
-                onClick={() => setActivePage("marketplace")}
-                className="px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold"
-              >
-                Browse Marketplace
-              </button>
+              <div className="flex items-center justify-center space-x-3 pt-2">
+                <button
+                  onClick={() => {
+                    if (products.length > 0) handleSelectProductForOrder(products[0].id);
+                    setOrderModalOpen(true);
+                  }}
+                  className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-sm flex items-center space-x-1.5"
+                >
+                  <PlusCircle className="w-4 h-4" />
+                  <span>Send Purchase Request</span>
+                </button>
+                <button
+                  onClick={() => setActivePage("marketplace")}
+                  className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold border border-slate-200"
+                >
+                  Browse Marketplace
+                </button>
+              </div>
             </div>
           ) : (
             <div className="space-y-3">
@@ -544,6 +709,178 @@ export default function BuyerRequests({ setActivePage }) {
                 >
                   <Send className="w-3.5 h-3.5" />
                   <span>Publish Requirement</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* SEND PURCHASE REQUEST MODAL */}
+      {orderModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200">
+            {/* Modal Header */}
+            <div className="bg-gradient-to-r from-emerald-600 to-teal-700 p-5 text-white flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-white/10 rounded-xl">
+                  <ShoppingBag className="w-5 h-5 text-emerald-200" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-base">Send Purchase Request to Farmer</h3>
+                  <p className="text-xs text-emerald-100">Submit an official procurement order directly to the grower</p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setOrderModalOpen(false)} 
+                className="p-1 rounded-lg bg-white/10 hover:bg-white/20 text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Form */}
+            <form onSubmit={handleCreateOrder} className="p-6 space-y-4">
+              {/* Product Selector */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  Select Crop from Marketplace
+                </label>
+                <select
+                  value={newOrder.productId || "custom"}
+                  onChange={(e) => handleSelectProductForOrder(e.target.value)}
+                  className="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none text-slate-800 font-medium"
+                >
+                  {products.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name} — {p.farmerName} ({p.district}) • Rs. {p.pricePerKg}/{p.unit}
+                    </option>
+                  ))}
+                  <option value="custom">+ Other / Custom Crop Requirement</option>
+                </select>
+              </div>
+
+              {/* Crop & Farmer Details */}
+              <div className="p-3 bg-emerald-50/70 rounded-2xl border border-emerald-100 space-y-2 text-xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-500 text-[11px]">Selected Commodity:</span>
+                  <input
+                    type="text"
+                    value={newOrder.productName}
+                    onChange={(e) => setNewOrder({ ...newOrder, productName: e.target.value })}
+                    placeholder="Enter crop name"
+                    className="font-bold text-slate-900 bg-white px-2 py-1 rounded-lg border border-emerald-200 text-xs text-right focus:outline-none"
+                    required
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-500 text-[11px]">Producer / Farmer:</span>
+                  <input
+                    type="text"
+                    value={newOrder.farmerName}
+                    onChange={(e) => setNewOrder({ ...newOrder, farmerName: e.target.value })}
+                    placeholder="Farmer name"
+                    className="font-semibold text-slate-700 bg-white px-2 py-1 rounded-lg border border-emerald-200 text-xs text-right focus:outline-none"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Quantity & Price */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                    Order Quantity ({newOrder.unit || "kg"})
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    placeholder="e.g. 500"
+                    value={newOrder.quantity}
+                    onChange={(e) => setNewOrder({ ...newOrder, quantity: e.target.value })}
+                    className="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none font-bold text-slate-800"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                    Offered Price (Rs./{newOrder.unit || "kg"})
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    placeholder="e.g. 350"
+                    value={newOrder.offeredPricePerKg}
+                    onChange={(e) => setNewOrder({ ...newOrder, offeredPricePerKg: e.target.value })}
+                    className="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none font-bold text-emerald-700"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Estimated Total Calculation */}
+              <div className="p-3 bg-slate-50 rounded-2xl flex items-center justify-between text-xs border border-slate-200">
+                <span className="font-semibold text-slate-700">Total Purchase Value:</span>
+                <span className="font-black text-emerald-700 text-base">
+                  Rs. {(Number(newOrder.quantity) * Number(newOrder.offeredPricePerKg) || 0).toLocaleString()}
+                </span>
+              </div>
+
+              {/* Delivery Date & Address */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">Target Delivery Date</label>
+                  <input
+                    type="date"
+                    value={newOrder.deliveryDate}
+                    onChange={(e) => setNewOrder({ ...newOrder, deliveryDate: e.target.value })}
+                    className="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none text-slate-700"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">Delivery Depot / Address</label>
+                  <input
+                    type="text"
+                    value={newOrder.deliveryAddress}
+                    onChange={(e) => setNewOrder({ ...newOrder, deliveryAddress: e.target.value })}
+                    placeholder="e.g. Meegoda Wholesale Center"
+                    className="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none text-slate-700"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Instructions */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  Instructions / Packaging Notes (Optional)
+                </label>
+                <textarea
+                  rows={2}
+                  placeholder="e.g. Wash and pack in 20kg crates. We will pick up from farm gate."
+                  value={newOrder.note}
+                  onChange={(e) => setNewOrder({ ...newOrder, note: e.target.value })}
+                  className="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none text-slate-700"
+                ></textarea>
+              </div>
+
+              {/* Submit Buttons */}
+              <div className="flex items-center justify-end space-x-2 pt-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setOrderModalOpen(false)}
+                  className="px-4 py-2 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center space-x-1.5"
+                >
+                  <Send className="w-3.5 h-3.5" />
+                  <span>Send Purchase Request</span>
                 </button>
               </div>
             </form>

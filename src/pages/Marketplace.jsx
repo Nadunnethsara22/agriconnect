@@ -129,6 +129,9 @@ export default function Marketplace({
     setTimeout(() => {
       setRequestModalProduct(null);
       setRequestSuccess(false);
+      if (setActivePage) {
+        setActivePage("buyer-requests");
+      }
     }, 1200);
   };
 

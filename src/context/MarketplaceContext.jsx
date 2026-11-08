@@ -109,13 +109,21 @@ export const MarketplaceProvider = ({ children }) => {
         const reqSnap = await getDocs(collection(db, "buyer_requests"));
         if (!reqSnap.empty) {
           const list = reqSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-          setBuyerRequests(list);
+          setBuyerRequests(prev => {
+            const firestoreIds = new Set(list.map(i => i.id));
+            const localOnly = prev.filter(p => !firestoreIds.has(p.id));
+            return [...localOnly, ...list];
+          });
         }
 
         const wantedSnap = await getDocs(collection(db, "wanted_posts"));
         if (!wantedSnap.empty) {
           const list = wantedSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-          setWantedPosts(list);
+          setWantedPosts(prev => {
+            const firestoreIds = new Set(list.map(i => i.id));
+            const localOnly = prev.filter(p => !firestoreIds.has(p.id));
+            return [...localOnly, ...list];
+          });
         }
 
         const priceSnap = await getDocs(collection(db, "economic_prices"));
@@ -211,6 +219,7 @@ export const MarketplaceProvider = ({ children }) => {
       id: newId,
       buyerId: user?.uid || "buyer-1",
       buyerName: user?.displayName || "Buyer",
+      buyerEmail: user?.email || "",
       buyerBusiness: user?.businessName || "Wholesale Buyer",
       buyerPhone: user?.phone || "+94 77 987 6543",
       buyerDistrict: user?.district || "Colombo",
@@ -224,7 +233,8 @@ export const MarketplaceProvider = ({ children }) => {
 
     if (isFirebaseConfigured && db) {
       try {
-        const docRef = await addDoc(collection(db, "buyer_requests"), newRequest);
+        const firestoreClean = JSON.parse(JSON.stringify(newRequest));
+        const docRef = await addDoc(collection(db, "buyer_requests"), firestoreClean);
         newRequest.id = docRef.id;
       } catch (e) {
         console.warn("Could not save request to firestore:", e);
@@ -274,6 +284,7 @@ export const MarketplaceProvider = ({ children }) => {
       id: newId,
       buyerId: user?.uid || "buyer-1",
       buyerName: user?.displayName || "Buyer",
+      buyerEmail: user?.email || "",
       buyerBusiness: user?.businessName || "Produce Merchant",
       buyerPhone: user?.phone || "+94 77 987 6543",
       buyerDistrict: user?.district || "Colombo",
@@ -287,7 +298,8 @@ export const MarketplaceProvider = ({ children }) => {
 
     if (isFirebaseConfigured && db) {
       try {
-        const docRef = await addDoc(collection(db, "wanted_posts"), newPost);
+        const firestoreClean = JSON.parse(JSON.stringify(newPost));
+        const docRef = await addDoc(collection(db, "wanted_posts"), firestoreClean);
         newPost.id = docRef.id;
       } catch (e) {
         console.warn("Firestore wanted post error:", e);
