@@ -182,81 +182,170 @@ export default function ProfilePage({ setActivePage }) {
       </div>
 
       {/* Profile Header Banner */}
-      <div className="relative rounded-3xl overflow-hidden shadow-xl border border-slate-200 bg-white">
-        {/* Cover banner */}
-        <div className={`h-36 sm:h-44 w-full ${
-          isAdmin
-            ? "bg-gradient-to-r from-purple-950 via-purple-900 to-indigo-950"
-            : isFarmer 
-            ? "bg-gradient-to-r from-emerald-800 via-green-800 to-teal-900" 
-            : "bg-gradient-to-r from-amber-700 via-yellow-800 to-slate-900"
-        }`}></div>
+      <div className="relative rounded-3xl overflow-hidden shadow-xl border border-slate-200/80 bg-white">
+        {/* Cover banner with Scenic Agricultural Photo & Soft Gradient Overlay */}
+        <div className="relative h-44 sm:h-56 w-full overflow-hidden bg-slate-900">
+          <img
+            src={
+              isAdmin
+                ? "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1600&q=80"
+                : isFarmer
+                ? "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=1600&q=80"
+                : "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1600&q=80"
+            }
+            alt="Profile Cover"
+            className="w-full h-full object-cover object-center transform hover:scale-105 transition-transform duration-700 ease-out"
+          />
+          {/* Subtle gradient overlay to provide contrast and warmth */}
+          <div className={`absolute inset-0 ${
+            isAdmin
+              ? "bg-gradient-to-t from-purple-950/90 via-purple-900/40 to-black/30"
+              : isFarmer
+              ? "bg-gradient-to-t from-emerald-950/90 via-emerald-900/40 to-black/30"
+              : "bg-gradient-to-t from-amber-950/90 via-amber-900/40 to-black/30"
+          }`} />
 
-        {/* User Info Bar */}
-        <div className="px-6 pb-6 pt-0 sm:flex sm:items-end sm:justify-between sm:space-x-5 relative">
-          <div className="flex items-end -mt-16 sm:-mt-20 space-x-4">
-            <div className="relative group">
-              <img
-                src={formData.avatar || "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=300&q=80"}
-                alt={formData.displayName}
-                className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl object-cover border-4 border-white shadow-xl bg-slate-100"
-              />
-              <label
-                htmlFor="avatar-file-upload"
-                className="absolute inset-0 bg-black/40 text-white rounded-3xl flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer text-xs font-semibold"
-                title="Upload Photo from Device"
-              >
-                <Camera className="w-5 h-5 mb-0.5" />
-                <span>Change</span>
-              </label>
-              <span className={`absolute bottom-1 right-1 p-1.5 rounded-xl text-white shadow-md z-10 ${
-                isAdmin ? "bg-purple-600" : isFarmer ? "bg-emerald-600" : "bg-amber-600"
-              }`}>
-                {isAdmin ? <ShieldCheck className="w-3.5 h-3.5" /> : isFarmer ? <Sprout className="w-3.5 h-3.5" /> : <ShoppingBag className="w-3.5 h-3.5" />}
-              </span>
-            </div>
-
-            <div className="pb-2 space-y-1">
-              <div className="flex items-center space-x-2">
-                <h1 className="text-xl sm:text-2xl font-black text-slate-900">
-                  {formData.displayName || user.displayName}
-                </h1>
-                <ShieldCheck className="w-5 h-5 text-emerald-600 flex-shrink-0" />
-              </div>
-              <p className="text-xs text-slate-500 font-medium">
-                {user.email} • {isAdmin ? "National Price Administrator" : isFarmer ? (formData.farmName || "Farm Producer") : (formData.businessName || "Wholesale Buyer")}
-              </p>
-              <div className="flex flex-wrap gap-1.5 pt-0.5">
-                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                  isAdmin ? "bg-purple-100 text-purple-800" : isFarmer ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"
-                }`}>
-                  {user.role} {isAdmin ? "(Price Controller)" : `(${formData.district})`}
-                </span>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-100 text-slate-600">
-                  🇱🇰 Sri Lanka
-                </span>
-              </div>
-            </div>
+          {/* Top Banner Tag / Pill */}
+          <div className="absolute top-4 left-4 sm:top-5 sm:left-6 flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-white/95 bg-black/40 backdrop-blur-md border border-white/20 shadow-sm">
+              {isAdmin ? (
+                <>
+                  <ShieldCheck className="w-3.5 h-3.5 text-purple-300" />
+                  <span>National Price Authority</span>
+                </>
+              ) : isFarmer ? (
+                <>
+                  <Sprout className="w-3.5 h-3.5 text-emerald-300" />
+                  <span>Sri Lanka Certified Producer</span>
+                </>
+              ) : (
+                <>
+                  <ShoppingBag className="w-3.5 h-3.5 text-amber-300" />
+                  <span>Verified Wholesale Buyer</span>
+                </>
+              )}
+            </span>
           </div>
 
-          {/* Quick Stats Pill */}
-          <div className="mt-4 sm:mt-0 flex items-center space-x-3 text-xs">
-            {isAdmin ? (
-              <div className="p-3 bg-purple-50 rounded-2xl border border-purple-100 text-right">
-                <p className="text-slate-400 text-[10px]">Authority</p>
-                <p className="text-lg font-black text-purple-900">Price Controller</p>
+          {/* District Tag in Top Right */}
+          <div className="absolute top-4 right-4 sm:top-5 sm:right-6">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-white/90 bg-black/40 backdrop-blur-md border border-white/20 shadow-sm">
+              <MapPin className="w-3.5 h-3.5 text-emerald-300" />
+              <span>{formData.district || "Sri Lanka"}</span>
+            </span>
+          </div>
+        </div>
+
+        {/* User Info Bar */}
+        <div className="px-6 pb-6 pt-0 relative">
+          <div className="sm:flex sm:items-end sm:justify-between sm:space-x-5">
+            {/* Avatar & Main Details */}
+            <div className="flex flex-col sm:flex-row items-center sm:items-end -mt-16 sm:-mt-20 gap-4 text-center sm:text-left">
+              {/* Avatar with Ring & Status Indicator */}
+              <div className="relative group flex-shrink-0">
+                <img
+                  src={formData.avatar || DEFAULT_AVATAR}
+                  alt={formData.displayName}
+                  className="w-28 h-28 sm:w-32 sm:h-32 rounded-3xl object-cover ring-4 ring-white shadow-2xl bg-white"
+                />
+                <label
+                  htmlFor="avatar-file-upload"
+                  className="absolute inset-0 bg-black/50 text-white rounded-3xl flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer text-xs font-semibold backdrop-blur-[2px]"
+                  title="Upload Photo"
+                >
+                  <Camera className="w-5 h-5 mb-0.5 text-emerald-400" />
+                  <span>Change</span>
+                </label>
+                {/* Role Icon Floating Badge */}
+                <span className={`absolute -bottom-1 -right-1 p-2 rounded-2xl text-white shadow-lg ring-2 ring-white z-10 ${
+                  isAdmin ? "bg-purple-600" : isFarmer ? "bg-emerald-600" : "bg-amber-600"
+                }`}>
+                  {isAdmin ? <ShieldCheck className="w-4 h-4" /> : isFarmer ? <Sprout className="w-4 h-4" /> : <ShoppingBag className="w-4 h-4" />}
+                </span>
               </div>
-            ) : isFarmer ? (
-              <div className="p-3 bg-emerald-50 rounded-2xl border border-emerald-100 text-right">
-                <p className="text-slate-400 text-[10px]">Active Crops</p>
-                <p className="text-lg font-black text-emerald-800">{farmerCropCount} Listed</p>
+
+              {/* Names and Details */}
+              <div className="pb-1 space-y-1.5">
+                <div className="flex items-center justify-center sm:justify-start gap-2">
+                  <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight capitalize">
+                    {formData.displayName || user.displayName}
+                  </h1>
+                  <span title="Verified Account">
+                    <ShieldCheck className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+                  </span>
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    Active
+                  </span>
+                </div>
+
+                <p className="text-xs sm:text-sm text-slate-600 font-medium flex items-center justify-center sm:justify-start gap-1.5 flex-wrap">
+                  <span>{user.email}</span>
+                  <span className="text-slate-300">•</span>
+                  <span className="font-semibold text-slate-800">
+                    {isAdmin ? "National Price Administrator" : isFarmer ? (formData.farmName || "Farm Producer") : (formData.businessName || "Wholesale Buyer")}
+                  </span>
+                </p>
+
+                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-1">
+                  <span className={`px-2.5 py-1 rounded-xl text-[11px] font-bold uppercase tracking-wider shadow-xs ${
+                    isAdmin 
+                      ? "bg-purple-100 text-purple-900 border border-purple-200" 
+                      : isFarmer 
+                      ? "bg-emerald-100 text-emerald-900 border border-emerald-200" 
+                      : "bg-amber-100 text-amber-900 border border-amber-200"
+                  }`}>
+                    {user.role} {isAdmin ? "(Price Controller)" : `(${formData.district})`}
+                  </span>
+                  <span className="px-2.5 py-1 rounded-xl text-[11px] font-medium bg-slate-100 text-slate-700 border border-slate-200">
+                    🇱🇰 Sri Lanka
+                  </span>
+                  {formData.location && (
+                    <span className="px-2.5 py-1 rounded-xl text-[11px] font-medium bg-slate-100 text-slate-600 border border-slate-200 inline-flex items-center gap-1">
+                      <MapPin className="w-3 h-3 text-slate-400" />
+                      <span>{formData.location}</span>
+                    </span>
+                  )}
+                </div>
               </div>
-            ) : (
-              <div className="p-3 bg-amber-50 rounded-2xl border border-amber-100 text-right">
-                <p className="text-slate-400 text-[10px]">Orders Placed</p>
-                <p className="text-lg font-black text-amber-800">{buyerOrdersCount} Requests</p>
-              </div>
-            )}
+            </div>
+
+            {/* Quick Stats Cards on the Right */}
+            <div className="mt-5 sm:mt-0 flex items-center justify-center sm:justify-end gap-3 flex-shrink-0">
+              {isAdmin ? (
+                <div className="p-3.5 bg-purple-50/80 rounded-2xl border border-purple-100 text-right min-w-[120px] shadow-xs">
+                  <p className="text-slate-500 text-[10px] font-semibold uppercase tracking-wider">Authority</p>
+                  <p className="text-lg font-black text-purple-950">Price Controller</p>
+                  <p className="text-[10px] text-purple-700 font-medium mt-0.5">National Level</p>
+                </div>
+              ) : isFarmer ? (
+                <div className="flex items-center gap-2.5">
+                  <div className="p-3.5 bg-emerald-50/80 rounded-2xl border border-emerald-100 text-center min-w-[110px] shadow-xs">
+                    <p className="text-slate-500 text-[10px] font-semibold uppercase tracking-wider">Active Crops</p>
+                    <p className="text-xl font-black text-emerald-800">{farmerCropCount}</p>
+                    <p className="text-[10px] text-emerald-600 font-medium mt-0.5">Listed in Market</p>
+                  </div>
+                  <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 text-center min-w-[100px] shadow-xs hidden sm:block">
+                    <p className="text-slate-500 text-[10px] font-semibold uppercase tracking-wider">Trade Rate</p>
+                    <p className="text-xl font-black text-slate-800">100%</p>
+                    <p className="text-[10px] text-emerald-600 font-medium mt-0.5">Direct Price</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2.5">
+                  <div className="p-3.5 bg-amber-50/80 rounded-2xl border border-amber-100 text-center min-w-[110px] shadow-xs">
+                    <p className="text-slate-500 text-[10px] font-semibold uppercase tracking-wider">Orders</p>
+                    <p className="text-xl font-black text-amber-900">{buyerOrdersCount}</p>
+                    <p className="text-[10px] text-amber-700 font-medium mt-0.5">Requests Placed</p>
+                  </div>
+                  <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 text-center min-w-[100px] shadow-xs hidden sm:block">
+                    <p className="text-slate-500 text-[10px] font-semibold uppercase tracking-wider">Tier</p>
+                    <p className="text-xl font-black text-slate-800">Verified</p>
+                    <p className="text-[10px] text-slate-600 font-medium mt-0.5">Wholesale</p>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
