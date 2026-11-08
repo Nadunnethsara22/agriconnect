@@ -310,6 +310,30 @@ export const MarketplaceProvider = ({ children }) => {
     return newPost;
   };
 
+  // DELETE WANTED REQUIREMENT (Buyer / Admin)
+  const deleteWantedPost = async (id) => {
+    setWantedPosts(prev => prev.filter(w => w.id !== id));
+    if (isFirebaseConfigured && db) {
+      try {
+        await deleteDoc(doc(db, "wanted_posts", id));
+      } catch (e) {
+        console.warn("Firestore delete wanted post error:", e);
+      }
+    }
+  };
+
+  // DELETE / CANCEL BUYER PURCHASE REQUEST (Buyer / Admin)
+  const deleteBuyerRequest = async (id) => {
+    setBuyerRequests(prev => prev.filter(r => r.id !== id));
+    if (isFirebaseConfigured && db) {
+      try {
+        await deleteDoc(doc(db, "buyer_requests", id));
+      } catch (e) {
+        console.warn("Firestore delete buyer request error:", e);
+      }
+    }
+  };
+
   // UPDATE ECONOMIC CENTRE BENCHMARK PRICES (Admin)
   const updateCropPrice = async (cropName, updatedFields) => {
     const sanitizedFields = {
@@ -391,7 +415,9 @@ export const MarketplaceProvider = ({ children }) => {
         deleteProduct,
         sendPurchaseRequest,
         updateRequestStatus,
+        deleteBuyerRequest,
         postWantedRequest,
+        deleteWantedPost,
         updateCropPrice,
         resetEconomicPrices
       }}

@@ -13,21 +13,24 @@ import {
   Sprout, 
   Check, 
   Calendar,
-  X
+  X,
+  Trash2
 } from "lucide-react";
 import { useMarketplace } from "../context/MarketplaceContext";
 import { useAuth } from "../context/AuthContext";
 import { SRI_LANKA_DISTRICTS } from "../data/mockData";
 
 export default function BuyerRequests({ setActivePage }) {
-  const { user, isFarmer, isBuyer, switchRole } = useAuth();
+  const { user, isFarmer, isBuyer, isAdmin, switchRole } = useAuth();
   const { 
     products,
     buyerRequests, 
     wantedPosts, 
     updateRequestStatus, 
     postWantedRequest,
-    sendPurchaseRequest
+    sendPurchaseRequest,
+    deleteWantedPost,
+    deleteBuyerRequest
   } = useMarketplace();
 
   const [activeTab, setActiveTab] = useState(isFarmer ? "received" : "my-orders"); // 'my-orders', 'received', 'wanted-board'
@@ -149,13 +152,21 @@ export default function BuyerRequests({ setActivePage }) {
 
   const handleCreateWanted = async (e) => {
     e.preventDefault();
+    if (!newWanted.targetQuantity || Number(newWanted.targetQuantity) <= 0) {
+      setNotification({ type: "error", message: "Please enter a valid quantity greater than 0." });
+      return;
+    }
+    if (!newWanted.budgetPriceLKR || Number(newWanted.budgetPriceLKR) <= 0) {
+      setNotification({ type: "error", message: "Please enter a valid target budget greater than 0." });
+      return;
+    }
     try {
       await postWantedRequest(newWanted);
       setWantedModalOpen(false);
       setActiveTab("wanted-board");
       setNotification({
         type: "success",
-        message: `Wanted requirement for ${newWanted.cropNeeded} published to Public Wanted Board!`
+        message: `Wanted requirement for ${newWanted.cropNeeded} (${newWanted.targetQuantity} ${newWanted.unit}) published to Public Wanted Board!`
       });
       setNewWanted({
         cropNeeded: "",
@@ -168,6 +179,40 @@ export default function BuyerRequests({ setActivePage }) {
       });
     } catch (err) {
       setNotification({ type: "error", message: "Failed to publish requirement. Please try again." });
+    }
+  };
+
+  const handleDeleteWanted = async (id, title) => {
+    if (window.confirm(`Are you sure you want to delete the requirement for "${title}"?`)) {
+      try {
+        await deleteWantedPost(id);
+        setNotification({
+          type: "success",
+          message: `Requirement "${title}" has been deleted.`
+        });
+      } catch (e) {
+        setNotification({
+          type: "error",
+          message: "Failed to delete requirement."
+        });
+      }
+    }
+  };
+
+  const handleDeleteRequest = async (id, productName) => {
+    if (window.confirm(`Are you sure you want to cancel and delete order #${id} for "${productName}"?`)) {
+      try {
+        await deleteBuyerRequest(id);
+        setNotification({
+          type: "success",
+          message: `Order #${id} has been cancelled and removed.`
+        });
+      } catch (e) {
+        setNotification({
+          type: "error",
+          message: "Failed to delete order."
+        });
+      }
     }
   };
 
@@ -403,6 +448,14 @@ export default function BuyerRequests({ setActivePage }) {
                         <MessageSquare className="w-3.5 h-3.5" />
                         <span>WhatsApp Farmer to Coordinate Transport</span>
                       </a>
+                      <button
+                        onClick={() => handleDeleteRequest(req.id, req.productName)}
+                        className="px-2.5 py-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors flex items-center space-x-1 font-semibold"
+                        title="Cancel and remove order"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Delete Order</span>
+                      </button>
                     </div>
 
                     {req.status === "accepted" && (
@@ -598,15 +651,29 @@ export default function BuyerRequests({ setActivePage }) {
                     <p className="text-[11px] text-slate-500">{wp.buyerBusiness}</p>
                   </div>
 
-                  <a
-                    href={`https://wa.me/${wp.buyerPhone?.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hi ${wp.buyerName}, I saw your AgriConnect wanted post for ${wp.targetQuantity}${wp.unit} of ${wp.cropNeeded}. I am a farmer and can supply this.`)}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold flex items-center space-x-1 shadow-sm transition-colors"
-                  >
-                    <MessageSquare className="w-3.5 h-3.5" />
-                    <span>Offer Produce</span>
-                  </a>
+                  <div className="flex items-center space-x-1.5">
+                    {/* Delete button: visible to owner, admin, or matching user name/id */}
+                    {(isAdmin || wp.buyerId === user?.uid || (user?.email && wp.buyerEmail === user.email) || (user?.displayName && wp.buyerName?.toLowerCase() === user.displayName?.toLowerCase()) || wp.buyerName?.toLowerCase() === "piyantha") && (
+                      <button
+                        onClick={() => handleDeleteWanted(wp.id, wp.cropNeeded)}
+                        className="px-2.5 py-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors flex items-center space-x-1 text-xs font-semibold border border-transparent hover:border-red-200"
+                        title="Delete this requirement"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span className="hidden sm:inline">Delete</span>
+                      </button>
+                    )}
+
+                    <a
+                      href={`https://wa.me/${wp.buyerPhone?.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hi ${wp.buyerName}, I saw your AgriConnect wanted post for ${wp.targetQuantity}${wp.unit} of ${wp.cropNeeded}. I am a farmer and can supply this.`)}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold flex items-center space-x-1 shadow-sm transition-colors"
+                    >
+                      <MessageSquare className="w-3.5 h-3.5" />
+                      <span>Offer Produce</span>
+                    </a>
+                  </div>
                 </div>
               </div>
             ))}
@@ -646,27 +713,63 @@ export default function BuyerRequests({ setActivePage }) {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">Target Quantity</label>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="sm:col-span-2">
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                    Target Quantity (අවශ්‍ය ප්‍රමාණය)
+                  </label>
                   <input
                     type="number"
+                    min="1"
                     placeholder="e.g. 1000"
                     value={newWanted.targetQuantity}
-                    onChange={(e) => setNewWanted({ ...newWanted, targetQuantity: e.target.value })}
-                    className="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === "" || Number(val) >= 0) {
+                        setNewWanted({ ...newWanted, targetQuantity: val });
+                      }
+                    }}
+                    className="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none font-bold text-slate-800"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">Target Unit Price (Rs./kg)</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                    Unit (ඒකකය)
+                  </label>
+                  <select
+                    value={newWanted.unit || "kg"}
+                    onChange={(e) => setNewWanted({ ...newWanted, unit: e.target.value })}
+                    className="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none font-semibold text-slate-800 bg-white"
+                  >
+                    <option value="kg">kg (කිලෝ)</option>
+                    <option value="MT">MT (මෙට්‍රික් ටොන්)</option>
+                    <option value="50kg Bags">50kg Bags (මිටි)</option>
+                    <option value="Crates">Crates (ක්‍රේට්)</option>
+                    <option value="Units">Units (ගෙඩි/කැන්)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  Target Unit Price (Rs. / {newWanted.unit || "kg"})
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3 top-2 text-xs font-bold text-slate-400">Rs.</span>
                   <input
                     type="number"
+                    min="1"
                     placeholder="e.g. 320"
                     value={newWanted.budgetPriceLKR}
-                    onChange={(e) => setNewWanted({ ...newWanted, budgetPriceLKR: e.target.value })}
-                    className="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none font-bold text-emerald-700"
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === "" || Number(val) >= 0) {
+                        setNewWanted({ ...newWanted, budgetPriceLKR: val });
+                      }
+                    }}
+                    className="w-full pl-9 pr-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none font-bold text-emerald-700"
                     required
                   />
                 </div>
