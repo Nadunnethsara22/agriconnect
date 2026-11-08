@@ -16,21 +16,14 @@ import {
   Layers, 
   FileText,
   Sparkles,
-  Upload,
-  RotateCcw
+  Upload
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useMarketplace } from "../context/MarketplaceContext";
 import { SRI_LANKA_DISTRICTS } from "../data/mockData";
 
-// Curated avatar presets for farmers and buyers
-const AVATAR_PRESETS = [
-  { label: "Highland Farmer", url: "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=300&q=80" },
-  { label: "Village Farmer", url: "https://images.unsplash.com/photo-1595956553066-fe24a8c33395?auto=format&fit=crop&w=300&q=80" },
-  { label: "Organic Grower", url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80" },
-  { label: "Wholesale Merchant", url: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=80" },
-  { label: "Supermarket Buyer", url: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=300&q=80" }
-];
+// Default fallback avatar
+const DEFAULT_AVATAR = "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=300&q=80";
 
 export default function ProfilePage({ setActivePage }) {
   const { user, isFarmer, isBuyer, isAdmin, updateProfile } = useAuth();
@@ -66,7 +59,7 @@ export default function ProfilePage({ setActivePage }) {
         location: user.location || (user.district ? `${user.district}, Sri Lanka` : "Colombo, Sri Lanka"),
         bio: user.bio || "",
         designation: user.designation || (isAdmin ? "Economic Centre Market Price Analyst" : ""),
-        avatar: user.avatar || (isAdmin ? "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" : isFarmer ? AVATAR_PRESETS[0].url : AVATAR_PRESETS[3].url),
+        avatar: user.avatar || (isAdmin ? "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" : DEFAULT_AVATAR),
         farmName: user.farmName || (isFarmer ? `${user.displayName || "My"}'s Highland Farm` : ""),
         mainCrops: user.mainCrops || (isFarmer ? "Carrots, Leeks, Potatoes" : ""),
         businessName: user.businessName || (isBuyer ? `${user.displayName || "My"} Wholesale Network` : ""),
@@ -100,11 +93,6 @@ export default function ProfilePage({ setActivePage }) {
     setFormData(prev => ({ ...prev, [name]: value }));
     setSuccessMsg("");
     setErrorMsg("");
-  };
-
-  const handleAvatarSelect = (url) => {
-    setFormData(prev => ({ ...prev, avatar: url }));
-    setSuccessMsg("");
   };
 
   const handleFileUpload = (e) => {
@@ -289,98 +277,48 @@ export default function ProfilePage({ setActivePage }) {
           </div>
         )}
 
-        {/* Section 1: Avatar / Profile Photo Upload from Device */}
+        {/* Section 1: Profile Photo Upload */}
         <div className="space-y-4">
           <h2 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center space-x-2">
             <Camera className="w-4 h-4 text-emerald-600" />
-            <span>Profile Photo & Avatar (පැතිකඩ ඡායාරූපය)</span>
+            <span>Profile Photo</span>
           </h2>
 
           <div className="flex flex-col sm:flex-row sm:items-center gap-5 p-4 rounded-2xl bg-slate-50 border border-slate-200">
             {/* Live Preview Avatar */}
             <div className="relative group self-center sm:self-auto flex-shrink-0">
               <img
-                src={formData.avatar || (isFarmer ? AVATAR_PRESETS[0].url : AVATAR_PRESETS[3].url)}
+                src={formData.avatar || DEFAULT_AVATAR}
                 alt="Profile Preview"
                 className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover border-2 border-emerald-500 shadow-md bg-white"
               />
               <label 
                 htmlFor="avatar-file-upload" 
                 className="absolute inset-0 bg-black/40 text-white rounded-2xl flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer text-[10px] font-semibold"
-                title="Change Photo"
+                title="Upload Photo"
               >
                 <Camera className="w-5 h-5 mb-0.5" />
-                <span>Change</span>
+                <span>Upload</span>
               </label>
             </div>
 
-            {/* Upload Buttons & Description */}
-            <div className="flex-1 space-y-2 text-center sm:text-left">
-              <div>
-                <p className="text-xs font-bold text-slate-800">
-                  Upload Photo from Device (ඔබේ පරිගණකයෙන් හෝ දුරකථනයෙන් ඡායාරූපයක් එක් කරන්න)
-                </p>
-                <p className="text-[11px] text-slate-500 mt-0.5">
-                  Select any photo from your files or gallery. It will be automatically optimized and saved.
-                </p>
-              </div>
-
-              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-1">
-                {/* Native Device File Input */}
-                <input
-                  id="avatar-file-upload"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                />
-                <label
-                  htmlFor="avatar-file-upload"
-                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-sm cursor-pointer transition-all flex items-center space-x-1.5"
-                >
-                  <Upload className="w-3.5 h-3.5" />
-                  <span>Choose Photo from Device</span>
-                </label>
-
-                {formData.avatar && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setFormData(prev => ({ 
-                        ...prev, 
-                        avatar: isFarmer ? AVATAR_PRESETS[0].url : AVATAR_PRESETS[3].url 
-                      }));
-                      setSuccessMsg("Reset to default preset avatar.");
-                    }}
-                    className="px-3 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-semibold rounded-xl transition-colors flex items-center space-x-1"
-                  >
-                    <RotateCcw className="w-3.5 h-3.5" />
-                    <span>Reset to Preset</span>
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Quick Preset Avatars as optional alternative */}
-          <div className="space-y-2 pt-1">
-            <p className="text-xs text-slate-500 font-medium">Or choose a pre-made avatar:</p>
-            <div className="flex flex-wrap gap-2.5">
-              {AVATAR_PRESETS.map((preset, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => handleAvatarSelect(preset.url)}
-                  className={`flex items-center space-x-2 p-1.5 pr-3 rounded-xl border transition-all ${
-                    formData.avatar === preset.url
-                      ? "border-emerald-600 bg-emerald-50 text-emerald-900 font-bold shadow-sm"
-                      : "border-slate-200 hover:border-slate-300 text-slate-700 bg-white"
-                  }`}
-                >
-                  <img src={preset.url} alt={preset.label} className="w-7 h-7 rounded-lg object-cover" />
-                  <span className="text-[11px]">{preset.label}</span>
-                </button>
-              ))}
+            {/* Upload Button */}
+            <div className="flex-1 flex items-center justify-center sm:justify-start">
+              {/* Native Device File Input */}
+              <input
+                id="avatar-file-upload"
+                type="file"
+                accept="image/*"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
+              <label
+                htmlFor="avatar-file-upload"
+                className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-sm cursor-pointer transition-all flex items-center space-x-2"
+              >
+                <Upload className="w-4 h-4" />
+                <span>Upload Photo</span>
+              </label>
             </div>
           </div>
         </div>
