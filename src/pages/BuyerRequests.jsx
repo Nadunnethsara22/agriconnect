@@ -72,6 +72,13 @@ export default function BuyerRequests({ setActivePage }) {
     }
   }, [notification]);
 
+  // Ensure farmers default to received orders tab
+  useEffect(() => {
+    if (isFarmer && activeTab === "my-orders") {
+      setActiveTab("received");
+    }
+  }, [isFarmer, activeTab]);
+
   // Filter requests
   const mySentRequests = buyerRequests.filter(
     r => r.buyerId === user?.uid || 
@@ -118,6 +125,10 @@ export default function BuyerRequests({ setActivePage }) {
 
   const handleCreateOrder = async (e) => {
     e.preventDefault();
+    if (isFarmer) {
+      setNotification({ type: "error", message: "Farmers cannot create purchase requests. This feature is reserved for wholesale Buyers." });
+      return;
+    }
     if (!newOrder.productName) {
       setNotification({ type: "error", message: "Please select or specify a crop." });
       return;
@@ -152,6 +163,10 @@ export default function BuyerRequests({ setActivePage }) {
 
   const handleCreateWanted = async (e) => {
     e.preventDefault();
+    if (isFarmer) {
+      setNotification({ type: "error", message: "Farmers cannot post wanted requirements. This feature is reserved for wholesale Buyers." });
+      return;
+    }
     if (!newWanted.targetQuantity || Number(newWanted.targetQuantity) <= 0) {
       setNotification({ type: "error", message: "Please enter a valid quantity greater than 0." });
       return;
@@ -223,36 +238,54 @@ export default function BuyerRequests({ setActivePage }) {
         <div className="space-y-1">
           <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-semibold">
             <FileText className="w-3.5 h-3.5" />
-            <span>Orders & Custom Buying Requirements</span>
+            <span>{isFarmer ? "Incoming Buyer Orders & Market Demand" : "Orders & Custom Buying Requirements"}</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
-            Buyer Purchase Requests & Orders
+            {isFarmer ? "Buyer Requests & Market Demand" : "Buyer Purchase Requests & Orders"}
           </h1>
           <p className="text-xs sm:text-sm text-slate-500">
-            Track wholesale order status, negotiate agreements with farmers, or publish custom crop procurement requirements.
+            {isFarmer
+              ? "Review incoming wholesale purchase orders placed for your crops, or view public buyer requirements to offer your harvest."
+              : "Track wholesale order status, negotiate agreements with farmers, or publish custom crop procurement requirements."}
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5">
-          <button
-            onClick={() => {
-              if (products.length > 0 && !newOrder.productName) {
-                handleSelectProductForOrder(products[0].id);
-              }
-              setOrderModalOpen(true);
-            }}
-            className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center space-x-1.5 flex-shrink-0"
-          >
-            <ShoppingBag className="w-4 h-4" />
-            <span>+ Send Purchase Request</span>
-          </button>
-          <button
-            onClick={() => setWantedModalOpen(true)}
-            className="px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center space-x-1.5 flex-shrink-0"
-          >
-            <PlusCircle className="w-4 h-4" />
-            <span>+ Post Wanted Requirement</span>
-          </button>
+          {/* Only show "+ Send Purchase Request" and "+ Post Wanted Requirement" to Buyers */}
+          {!isFarmer && (
+            <>
+              <button
+                onClick={() => {
+                  if (products.length > 0 && !newOrder.productName) {
+                    handleSelectProductForOrder(products[0].id);
+                  }
+                  setOrderModalOpen(true);
+                }}
+                className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center space-x-1.5 flex-shrink-0"
+              >
+                <ShoppingBag className="w-4 h-4" />
+                <span>+ Send Purchase Request</span>
+              </button>
+              <button
+                onClick={() => setWantedModalOpen(true)}
+                className="px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center space-x-1.5 flex-shrink-0"
+              >
+                <PlusCircle className="w-4 h-4" />
+                <span>+ Post Wanted Requirement</span>
+              </button>
+            </>
+          )}
+
+          {isFarmer && (
+            <button
+              onClick={() => setActivePage("add-product")}
+              className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center space-x-1.5 flex-shrink-0"
+            >
+              <Sprout className="w-4 h-4" />
+              <span>+ Add New Harvest</span>
+            </button>
+          )}
+
           <button
             onClick={() => setActivePage("profile")}
             className="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition-all flex items-center space-x-1.5 flex-shrink-0 border border-slate-200"
@@ -289,17 +322,19 @@ export default function BuyerRequests({ setActivePage }) {
 
       {/* Tabs */}
       <div className="flex border-b border-slate-200 space-x-4 text-sm font-semibold">
-        <button
-          onClick={() => setActiveTab("my-orders")}
-          className={`pb-3 px-2 flex items-center space-x-2 border-b-2 transition-colors ${
-            activeTab === "my-orders"
-              ? "border-amber-600 text-amber-700 font-bold"
-              : "border-transparent text-slate-500 hover:text-slate-800"
-          }`}
-        >
-          <ShoppingBag className="w-4 h-4" />
-          <span>My Sent Purchase Orders ({mySentRequests.length})</span>
-        </button>
+        {!isFarmer && (
+          <button
+            onClick={() => setActiveTab("my-orders")}
+            className={`pb-3 px-2 flex items-center space-x-2 border-b-2 transition-colors ${
+              activeTab === "my-orders"
+                ? "border-amber-600 text-amber-700 font-bold"
+                : "border-transparent text-slate-500 hover:text-slate-800"
+            }`}
+          >
+            <ShoppingBag className="w-4 h-4" />
+            <span>My Sent Purchase Orders ({mySentRequests.length})</span>
+          </button>
+        )}
 
         <button
           onClick={() => setActiveTab("received")}
@@ -310,7 +345,7 @@ export default function BuyerRequests({ setActivePage }) {
           }`}
         >
           <Sprout className="w-4 h-4" />
-          <span>Received Farmer Requests ({receivedRequests.length})</span>
+          <span>{isFarmer ? "Received Buyer Orders" : "Received Farmer Requests"} ({receivedRequests.length})</span>
         </button>
 
         <button
@@ -681,8 +716,8 @@ export default function BuyerRequests({ setActivePage }) {
         </div>
       )}
 
-      {/* POST WANTED REQUIREMENT MODAL */}
-      {wantedModalOpen && (
+      {/* POST WANTED REQUIREMENT MODAL (Buyers only) */}
+      {wantedModalOpen && !isFarmer && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
           <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200">
             <div className="bg-gradient-to-r from-amber-600 to-amber-700 p-5 text-white flex items-center justify-between">
@@ -819,8 +854,8 @@ export default function BuyerRequests({ setActivePage }) {
         </div>
       )}
 
-      {/* SEND PURCHASE REQUEST MODAL */}
-      {orderModalOpen && (
+      {/* SEND PURCHASE REQUEST MODAL (Buyers only) */}
+      {orderModalOpen && !isFarmer && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
           <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200">
             {/* Modal Header */}

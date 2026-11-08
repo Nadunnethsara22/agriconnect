@@ -23,7 +23,7 @@ import { ECONOMIC_CENTRE_PRICES } from "../data/mockData";
 
 export default function ProductDetails({ product, setActivePage, setSelectedProduct }) {
   const { products, economicPrices, sendPurchaseRequest } = useMarketplace();
-  const { user } = useAuth();
+  const { user, isFarmer } = useAuth();
 
   const [orderQuantity, setOrderQuantity] = useState(product?.minOrderKg || 100);
   const [offeredPrice, setOfferedPrice] = useState(product?.pricePerKg || 350);
@@ -61,6 +61,10 @@ export default function ProductDetails({ product, setActivePage, setSelectedProd
 
   const handleSubmitRequest = async (e) => {
     e.preventDefault();
+    if (isFarmer) {
+      alert("Farmers cannot submit purchase requests. Only registered Buyers can place orders.");
+      return;
+    }
     if (!user) {
       if (confirm("Please sign in or register to submit purchase requests to farmers. Proceed to Sign In / Register?")) {
         setActivePage("auth");
@@ -274,17 +278,42 @@ export default function ProductDetails({ product, setActivePage, setSelectedProd
           <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xl space-y-6">
             <div className="border-b border-slate-100 pb-4">
               <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full">
-                Direct Purchase Offer
+                {isFarmer ? "Farmer View Mode" : "Direct Purchase Offer"}
               </span>
               <h2 className="text-xl font-extrabold text-slate-900 mt-1">
-                Send Purchase Request to Farmer
+                {isFarmer ? "Producer Harvest Listing" : "Send Purchase Request to Farmer"}
               </h2>
               <p className="text-xs text-slate-500 mt-0.5">
-                Negotiate quantity, wholesale rate, and delivery date with Sunil.
+                {isFarmer
+                  ? `Harvest produced by ${product.farmerName}. Contact directly via WhatsApp for peer discussions.`
+                  : `Negotiate quantity, wholesale rate, and delivery date with ${product.farmerName}.`}
               </p>
             </div>
 
-            {requestSent ? (
+            {isFarmer ? (
+              <div className="bg-emerald-50/60 rounded-2xl p-6 border border-emerald-100 text-center space-y-4">
+                <div className="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-2xl flex items-center justify-center mx-auto shadow-sm">
+                  <Sprout className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-slate-900 text-sm">Farmer Account Active</h3>
+                  <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+                    Purchase requests are for wholesale and retail <strong>Buyers</strong>. As a registered Farmer, you can view market demand or list crops on your Farmer Dashboard.
+                  </p>
+                </div>
+                <div className="pt-2">
+                  <a
+                    href={whatsappMessage}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-md flex items-center justify-center space-x-2 transition-colors"
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                    <span>Chat with Farmer on WhatsApp</span>
+                  </a>
+                </div>
+              </div>
+            ) : requestSent ? (
               <div className="py-8 text-center space-y-3">
                 <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full mx-auto flex items-center justify-center">
                   <CheckCircle className="w-10 h-10" />
