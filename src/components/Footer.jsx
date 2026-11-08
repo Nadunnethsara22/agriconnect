@@ -10,13 +10,47 @@ import {
   Truck 
 } from "lucide-react";
 import { ECONOMIC_CENTRES } from "../data/mockData";
+import { useAuth } from "../context/AuthContext";
 
 export default function Footer({ setActivePage, setSelectedCategory, onOpenFirebaseModal }) {
+  const { isAdmin } = useAuth();
+
   const openCategory = (cat) => {
     if (setSelectedCategory) setSelectedCategory(cat);
     setActivePage("marketplace");
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  if (isAdmin) {
+    return (
+      <footer className="bg-slate-900 text-slate-300 py-8 border-t border-purple-900/40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 rounded-lg bg-purple-700 flex items-center justify-center text-white shadow-md">
+              <ShieldCheck className="w-4 h-4 text-purple-200" />
+            </div>
+            <div>
+              <p className="font-extrabold text-white text-sm">
+                Agri<span className="text-purple-400">Connect</span> Sri Lanka • Price Control
+              </p>
+              <p className="text-[11px] text-slate-400">Official Economic Centre Daily Price Intelligence & Analytics</p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={() => { setActivePage("analytics"); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+              className="text-purple-400 hover:text-purple-300 font-bold flex items-center space-x-1"
+            >
+              <TrendingUp className="w-4 h-4" />
+              <span>Market Prices & Trends</span>
+            </button>
+            <span className="text-slate-700">•</span>
+            <span className="text-slate-500">© 2026 AgriConnect LK</span>
+          </div>
+        </div>
+      </footer>
+    );
+  }
   return (
     <footer className="bg-slate-900 text-slate-300 pt-16 pb-8 border-t border-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

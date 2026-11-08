@@ -40,7 +40,7 @@ export default function Navbar({ activePage, setActivePage, setAuthMode, onOpenF
         <div className="flex items-center justify-between h-16">
           {/* Logo and Brand */}
           <div 
-            onClick={() => navigate("landing")} 
+            onClick={() => navigate(isAdmin ? "analytics" : "landing")} 
             className="flex items-center space-x-3 cursor-pointer group"
           >
             <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-green-500 flex items-center justify-center text-white shadow-md shadow-emerald-500/20 group-hover:scale-105 transition-transform">
@@ -56,77 +56,89 @@ export default function Navbar({ activePage, setActivePage, setAuthMode, onOpenF
                 </span>
               </div>
               <p className="text-[10px] font-medium text-slate-500 -mt-1 hidden sm:block">
-                ගොවි-පාරිභෝගික කෘෂි වෙළඳපොළ
+                {isAdmin ? "National Price Intelligence Panel" : "ගොවි-පාරිභෝගික කෘෂි වෙළඳපොළ"}
               </p>
             </div>
           </div>
 
           {/* Desktop Navigation Links */}
           <nav className="hidden lg:flex items-center space-x-1">
-            <button
-              onClick={() => navigate("landing")}
-              className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                activePage === "landing"
-                  ? "bg-emerald-50 text-emerald-700 font-semibold"
-                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/70"
-              }`}
-            >
-              Home
-            </button>
-
-            <button
-              onClick={() => navigate("marketplace")}
-              className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors flex items-center space-x-1.5 ${
-                activePage === "marketplace" || activePage === "product-details"
-                  ? "bg-emerald-50 text-emerald-700 font-semibold"
-                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/70"
-              }`}
-            >
-              <ShoppingBag className="w-4 h-4 text-emerald-600" />
-              <span>Marketplace</span>
-            </button>
-
-            <button
-              onClick={() => navigate("buyer-requests")}
-              className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors flex items-center space-x-1.5 relative ${
-                activePage === "buyer-requests"
-                  ? "bg-emerald-50 text-emerald-700 font-semibold"
-                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/70"
-              }`}
-            >
-              <FileText className="w-4 h-4 text-emerald-600" />
-              <span>Buyer Requests</span>
-              {pendingRequestsCount > 0 && (
-                <span className="ml-1 px-1.5 py-0.2 text-[10px] font-bold bg-amber-500 text-white rounded-full">
-                  {pendingRequestsCount}
-                </span>
-              )}
-            </button>
-
-            <button
-              onClick={() => navigate("analytics")}
-              className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors flex items-center space-x-1.5 ${
-                activePage === "analytics"
-                  ? "bg-emerald-50 text-emerald-700 font-semibold"
-                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/70"
-              }`}
-            >
-              <TrendingUp className="w-4 h-4 text-emerald-600" />
-              <span>Market Prices & Trends</span>
-            </button>
-
-            {isFarmer && (
+            {isAdmin ? (
               <button
-                onClick={() => navigate("farmer-dashboard")}
-                className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors flex items-center space-x-1.5 ${
-                  activePage === "farmer-dashboard"
-                    ? "bg-emerald-50 text-emerald-700 font-semibold"
-                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/70"
-                }`}
+                onClick={() => navigate("analytics")}
+                className="px-4 py-2 text-sm font-bold rounded-xl transition-all flex items-center space-x-2 bg-purple-100 text-purple-900 border border-purple-200 shadow-xs"
               >
-                <Layers className="w-4 h-4 text-emerald-600" />
-                <span>Farmer Dashboard</span>
+                <TrendingUp className="w-4 h-4 text-purple-700" />
+                <span>Market Prices & Trends</span>
               </button>
+            ) : (
+              <>
+                <button
+                  onClick={() => navigate("landing")}
+                  className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                    activePage === "landing"
+                      ? "bg-emerald-50 text-emerald-700 font-semibold"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/70"
+                  }`}
+                >
+                  Home
+                </button>
+
+                <button
+                  onClick={() => navigate("marketplace")}
+                  className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors flex items-center space-x-1.5 ${
+                    activePage === "marketplace" || activePage === "product-details"
+                      ? "bg-emerald-50 text-emerald-700 font-semibold"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/70"
+                  }`}
+                >
+                  <ShoppingBag className="w-4 h-4 text-emerald-600" />
+                  <span>Marketplace</span>
+                </button>
+
+                <button
+                  onClick={() => navigate("buyer-requests")}
+                  className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors flex items-center space-x-1.5 relative ${
+                    activePage === "buyer-requests"
+                      ? "bg-emerald-50 text-emerald-700 font-semibold"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/70"
+                  }`}
+                >
+                  <FileText className="w-4 h-4 text-emerald-600" />
+                  <span>Buyer Requests</span>
+                  {pendingRequestsCount > 0 && (
+                    <span className="ml-1 px-1.5 py-0.2 text-[10px] font-bold bg-amber-500 text-white rounded-full">
+                      {pendingRequestsCount}
+                    </span>
+                  )}
+                </button>
+
+                <button
+                  onClick={() => navigate("analytics")}
+                  className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors flex items-center space-x-1.5 ${
+                    activePage === "analytics"
+                      ? "bg-emerald-50 text-emerald-700 font-semibold"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/70"
+                  }`}
+                >
+                  <TrendingUp className="w-4 h-4 text-emerald-600" />
+                  <span>Market Prices & Trends</span>
+                </button>
+
+                {isFarmer && (
+                  <button
+                    onClick={() => navigate("farmer-dashboard")}
+                    className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors flex items-center space-x-1.5 ${
+                      activePage === "farmer-dashboard"
+                        ? "bg-emerald-50 text-emerald-700 font-semibold"
+                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/70"
+                    }`}
+                  >
+                    <Layers className="w-4 h-4 text-emerald-600" />
+                    <span>Farmer Dashboard</span>
+                  </button>
+                )}
+              </>
             )}
           </nav>
 
@@ -176,51 +188,63 @@ export default function Navbar({ activePage, setActivePage, setAuthMode, onOpenF
                       </p>
                     </div>
 
-                    {isAdmin && (
-                      <button
-                        onClick={() => { setProfileDropdownOpen(false); navigate("analytics"); }}
-                        className="w-full text-left px-3 py-2 hover:bg-purple-50 text-purple-800 font-bold flex items-center space-x-2"
-                      >
-                        <ShieldCheck className="w-4 h-4 text-purple-600" />
-                        <span>Update Market Prices</span>
-                      </button>
+                    {isAdmin ? (
+                      <>
+                        <button
+                          onClick={() => { setProfileDropdownOpen(false); navigate("analytics"); }}
+                          className="w-full text-left px-3 py-2 hover:bg-purple-50 text-purple-800 font-bold flex items-center space-x-2"
+                        >
+                          <TrendingUp className="w-4 h-4 text-purple-600" />
+                          <span>Market Prices & Trends</span>
+                        </button>
+
+                        <button
+                          onClick={() => { setProfileDropdownOpen(false); onOpenFirebaseModal(); }}
+                          className="w-full text-left px-3 py-2 hover:bg-slate-50 flex items-center space-x-2 text-slate-700"
+                        >
+                          <Database className="w-4 h-4 text-slate-500" />
+                          <span>Firebase Settings</span>
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => { setProfileDropdownOpen(false); navigate("profile"); }}
+                          className="w-full text-left px-3 py-2 hover:bg-emerald-50 hover:text-emerald-800 flex items-center space-x-2 text-slate-700 font-medium"
+                        >
+                          <User className="w-4 h-4 text-emerald-600" />
+                          <span>Edit Profile (මගේ ගිණුම)</span>
+                        </button>
+
+                        {isFarmer && (
+                          <button
+                            onClick={() => { setProfileDropdownOpen(false); navigate("farmer-dashboard"); }}
+                            className="w-full text-left px-3 py-2 hover:bg-slate-50 flex items-center space-x-2 text-slate-700"
+                          >
+                            <Layers className="w-4 h-4 text-emerald-600" />
+                            <span>Farmer Dashboard</span>
+                          </button>
+                        )}
+
+                        {isBuyer && (
+                          <button
+                            onClick={() => { setProfileDropdownOpen(false); navigate("buyer-requests"); }}
+                            className="w-full text-left px-3 py-2 hover:bg-slate-50 flex items-center space-x-2 text-slate-700"
+                          >
+                            <ShoppingBag className="w-4 h-4 text-amber-600" />
+                            <span>My Purchase Orders</span>
+                          </button>
+                        )}
+
+                        <button
+                          onClick={() => { setProfileDropdownOpen(false); onOpenFirebaseModal(); }}
+                          className="w-full text-left px-3 py-2 hover:bg-slate-50 flex items-center space-x-2 text-slate-700"
+                        >
+                          <Database className="w-4 h-4 text-slate-500" />
+                          <span>Firebase Settings</span>
+                        </button>
+                      </>
                     )}
-
-                    <button
-                      onClick={() => { setProfileDropdownOpen(false); navigate("profile"); }}
-                      className="w-full text-left px-3 py-2 hover:bg-emerald-50 hover:text-emerald-800 flex items-center space-x-2 text-slate-700 font-medium"
-                    >
-                      <User className="w-4 h-4 text-emerald-600" />
-                      <span>Edit Profile (මගේ ගිණුම)</span>
-                    </button>
-
-                    {isFarmer && (
-                      <button
-                        onClick={() => { setProfileDropdownOpen(false); navigate("farmer-dashboard"); }}
-                        className="w-full text-left px-3 py-2 hover:bg-slate-50 flex items-center space-x-2 text-slate-700"
-                      >
-                        <Layers className="w-4 h-4 text-emerald-600" />
-                        <span>Farmer Dashboard</span>
-                      </button>
-                    )}
-
-                    {isBuyer && (
-                      <button
-                        onClick={() => { setProfileDropdownOpen(false); navigate("buyer-requests"); }}
-                        className="w-full text-left px-3 py-2 hover:bg-slate-50 flex items-center space-x-2 text-slate-700"
-                      >
-                        <ShoppingBag className="w-4 h-4 text-amber-600" />
-                        <span>My Purchase Orders</span>
-                      </button>
-                    )}
-
-                    <button
-                      onClick={() => { setProfileDropdownOpen(false); onOpenFirebaseModal(); }}
-                      className="w-full text-left px-3 py-2 hover:bg-slate-50 flex items-center space-x-2 text-slate-700"
-                    >
-                      <Database className="w-4 h-4 text-slate-500" />
-                      <span>Firebase Settings</span>
-                    </button>
 
                     <div className="border-t border-slate-100 my-1"></div>
 
@@ -273,67 +297,86 @@ export default function Navbar({ activePage, setActivePage, setAuthMode, onOpenF
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-slate-200 bg-white px-4 pt-3 pb-6 space-y-2 animate-fade-in text-sm">
-          {user && (
-            <div className="p-3 bg-slate-50 rounded-xl mb-3 flex items-center justify-between">
-              <div>
-                <p className="font-semibold text-slate-800 text-xs">{user.displayName}</p>
-                <p className="text-[11px] text-slate-400">{user.email}</p>
+          {isAdmin ? (
+            <div className="space-y-3">
+              <div className="p-3 bg-purple-50 rounded-xl border border-purple-100 text-xs">
+                <p className="font-bold text-purple-900">{user?.displayName || "Market Price Controller"}</p>
+                <p className="text-purple-700 text-[11px]">{user?.email}</p>
+                <p className="text-[10px] text-purple-600 font-medium mt-0.5">National Economic Centre Price Authority</p>
               </div>
               <button
-                onClick={() => navigate("profile")}
-                className="px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-800 hover:bg-emerald-200 transition-colors uppercase"
+                onClick={() => navigate("analytics")}
+                className="w-full text-left px-3 py-2.5 rounded-xl font-bold bg-purple-600 text-white flex items-center space-x-2 shadow-sm"
               >
-                Edit Profile
+                <TrendingUp className="w-4 h-4 text-purple-200" />
+                <span>Market Prices & Trends</span>
               </button>
             </div>
-          )}
-
-          <button
-            onClick={() => navigate("landing")}
-            className="w-full text-left px-3 py-2 rounded-lg font-medium text-slate-700 hover:bg-slate-100"
-          >
-            Home
-          </button>
-          <button
-            onClick={() => navigate("marketplace")}
-            className="w-full text-left px-3 py-2 rounded-lg font-medium text-slate-700 hover:bg-slate-100 flex items-center justify-between"
-          >
-            <span>Product Marketplace</span>
-            <span className="text-xs text-emerald-600 font-normal">Browse 8+ Crops</span>
-          </button>
-          <button
-            onClick={() => navigate("buyer-requests")}
-            className="w-full text-left px-3 py-2 rounded-lg font-medium text-slate-700 hover:bg-slate-100 flex items-center justify-between"
-          >
-            <span>Buyer Purchase Requests</span>
-            {pendingRequestsCount > 0 && (
-              <span className="px-2 py-0.5 text-xs bg-amber-500 text-white rounded-full font-bold">
-                {pendingRequestsCount} new
-              </span>
-            )}
-          </button>
-          <button
-            onClick={() => navigate("analytics")}
-            className="w-full text-left px-3 py-2 rounded-lg font-medium text-slate-700 hover:bg-slate-100"
-          >
-            Market Prices & Price Statistics
-          </button>
-
-          {isFarmer && (
+          ) : (
             <>
+              {user && (
+                <div className="p-3 bg-slate-50 rounded-xl mb-3 flex items-center justify-between">
+                  <div>
+                    <p className="font-semibold text-slate-800 text-xs">{user.displayName}</p>
+                    <p className="text-[11px] text-slate-400">{user.email}</p>
+                  </div>
+                  <button
+                    onClick={() => navigate("profile")}
+                    className="px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-800 hover:bg-emerald-200 transition-colors uppercase"
+                  >
+                    Edit Profile
+                  </button>
+                </div>
+              )}
+
               <button
-                onClick={() => navigate("farmer-dashboard")}
-                className="w-full text-left px-3 py-2 rounded-lg font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100"
+                onClick={() => navigate("landing")}
+                className="w-full text-left px-3 py-2 rounded-lg font-medium text-slate-700 hover:bg-slate-100"
               >
-                Farmer Dashboard
+                Home
               </button>
               <button
-                onClick={() => navigate("add-product")}
-                className="w-full text-left px-3 py-2 rounded-lg font-medium text-white bg-emerald-600 hover:bg-emerald-700 flex items-center space-x-2"
+                onClick={() => navigate("marketplace")}
+                className="w-full text-left px-3 py-2 rounded-lg font-medium text-slate-700 hover:bg-slate-100 flex items-center justify-between"
               >
-                <PlusCircle className="w-4 h-4" />
-                <span>+ Add Agricultural Product</span>
+                <span>Product Marketplace</span>
+                <span className="text-xs text-emerald-600 font-normal">Browse 8+ Crops</span>
               </button>
+              <button
+                onClick={() => navigate("buyer-requests")}
+                className="w-full text-left px-3 py-2 rounded-lg font-medium text-slate-700 hover:bg-slate-100 flex items-center justify-between"
+              >
+                <span>Buyer Purchase Requests</span>
+                {pendingRequestsCount > 0 && (
+                  <span className="px-2 py-0.5 text-xs bg-amber-500 text-white rounded-full font-bold">
+                    {pendingRequestsCount} new
+                  </span>
+                )}
+              </button>
+              <button
+                onClick={() => navigate("analytics")}
+                className="w-full text-left px-3 py-2 rounded-lg font-medium text-slate-700 hover:bg-slate-100"
+              >
+                Market Prices & Price Statistics
+              </button>
+
+              {isFarmer && (
+                <>
+                  <button
+                    onClick={() => navigate("farmer-dashboard")}
+                    className="w-full text-left px-3 py-2 rounded-lg font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100"
+                  >
+                    Farmer Dashboard
+                  </button>
+                  <button
+                    onClick={() => navigate("add-product")}
+                    className="w-full text-left px-3 py-2 rounded-lg font-medium text-white bg-emerald-600 hover:bg-emerald-700 flex items-center space-x-2"
+                  >
+                    <PlusCircle className="w-4 h-4" />
+                    <span>+ Add Agricultural Product</span>
+                  </button>
+                </>
+              )}
             </>
           )}
 

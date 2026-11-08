@@ -18,7 +18,7 @@ import ProfilePage from "./pages/ProfilePage";
 import { Lock, Sprout, ShoppingBag } from "lucide-react";
 
 function AppContent() {
-  const { user, isFarmer } = useAuth();
+  const { user, isFarmer, isAdmin } = useAuth();
   const [activePage, setActivePage] = useState("landing");
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [firebaseModalOpen, setFirebaseModalOpen] = useState(false);
@@ -27,6 +27,13 @@ function AppContent() {
   const [selectedDistrict, setSelectedDistrict] = useState("all");
   const [authMode, setAuthMode] = useState("login"); // 'login' or 'register'
   const [initialRole, setInitialRole] = useState("farmer"); // 'farmer' or 'buyer'
+
+  // Admin users are strictly dedicated to Market Prices & Trends (analytics)
+  React.useEffect(() => {
+    if (isAdmin && activePage !== "analytics") {
+      setActivePage("analytics");
+    }
+  }, [isAdmin, activePage]);
 
   // Auth Protection Guards
   const isProtectedFarmerPage = activePage === "farmer-dashboard" || activePage === "add-product";
