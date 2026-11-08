@@ -15,7 +15,9 @@ import {
   ShieldCheck, 
   Layers, 
   FileText,
-  Sparkles
+  Sparkles,
+  Upload,
+  RotateCcw
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useMarketplace } from "../context/MarketplaceContext";
@@ -105,6 +107,58 @@ export default function ProfilePage({ setActivePage }) {
     setSuccessMsg("");
   };
 
+  const handleFileUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setErrorMsg("Please select a valid image file (JPG, PNG, WebP).");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        // Optimize and resize image to max 400x400 via canvas
+        const canvas = document.createElement("canvas");
+        const MAX_DIM = 400;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_DIM) {
+            height = Math.round((height * MAX_DIM) / width);
+            width = MAX_DIM;
+          }
+        } else {
+          if (height > MAX_DIM) {
+            width = Math.round((width * MAX_DIM) / height);
+            height = MAX_DIM;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const optimizedBase64 = canvas.toDataURL("image/jpeg", 0.88);
+        setFormData(prev => ({ ...prev, avatar: optimizedBase64 }));
+        setSuccessMsg("Photo loaded from your device! Click 'Save Profile Changes' below to update.");
+        setErrorMsg("");
+      };
+      img.onerror = () => {
+        setErrorMsg("Failed to read image file.");
+      };
+      img.src = event.target.result;
+    };
+    reader.onerror = () => {
+      setErrorMsg("Failed to process file.");
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
@@ -159,7 +213,15 @@ export default function ProfilePage({ setActivePage }) {
                 alt={formData.displayName}
                 className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl object-cover border-4 border-white shadow-xl bg-slate-100"
               />
-              <span className={`absolute bottom-1 right-1 p-1.5 rounded-xl text-white shadow-md ${
+              <label
+                htmlFor="avatar-file-upload"
+                className="absolute inset-0 bg-black/40 text-white rounded-3xl flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer text-xs font-semibold"
+                title="Upload Photo from Device"
+              >
+                <Camera className="w-5 h-5 mb-0.5" />
+                <span>Change</span>
+              </label>
+              <span className={`absolute bottom-1 right-1 p-1.5 rounded-xl text-white shadow-md z-10 ${
                 isAdmin ? "bg-purple-600" : isFarmer ? "bg-emerald-600" : "bg-amber-600"
               }`}>
                 {isAdmin ? <ShieldCheck className="w-3.5 h-3.5" /> : isFarmer ? <Sprout className="w-3.5 h-3.5" /> : <ShoppingBag className="w-3.5 h-3.5" />}
@@ -227,43 +289,98 @@ export default function ProfilePage({ setActivePage }) {
           </div>
         )}
 
-        {/* Section 1: Avatar Presets & Photo */}
-        <div className="space-y-3">
+        {/* Section 1: Avatar / Profile Photo Upload from Device */}
+        <div className="space-y-4">
           <h2 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center space-x-2">
             <Camera className="w-4 h-4 text-emerald-600" />
-            <span>Profile Photo & Avatar</span>
+            <span>Profile Photo & Avatar (පැතිකඩ ඡායාරූපය)</span>
           </h2>
 
-          <div className="space-y-2">
-            <p className="text-xs text-slate-500">Choose a preset avatar or paste a custom profile image URL:</p>
-            <div className="flex flex-wrap gap-3">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-5 p-4 rounded-2xl bg-slate-50 border border-slate-200">
+            {/* Live Preview Avatar */}
+            <div className="relative group self-center sm:self-auto flex-shrink-0">
+              <img
+                src={formData.avatar || (isFarmer ? AVATAR_PRESETS[0].url : AVATAR_PRESETS[3].url)}
+                alt="Profile Preview"
+                className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover border-2 border-emerald-500 shadow-md bg-white"
+              />
+              <label 
+                htmlFor="avatar-file-upload" 
+                className="absolute inset-0 bg-black/40 text-white rounded-2xl flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer text-[10px] font-semibold"
+                title="Change Photo"
+              >
+                <Camera className="w-5 h-5 mb-0.5" />
+                <span>Change</span>
+              </label>
+            </div>
+
+            {/* Upload Buttons & Description */}
+            <div className="flex-1 space-y-2 text-center sm:text-left">
+              <div>
+                <p className="text-xs font-bold text-slate-800">
+                  Upload Photo from Device (ඔබේ පරිගණකයෙන් හෝ දුරකථනයෙන් ඡායාරූපයක් එක් කරන්න)
+                </p>
+                <p className="text-[11px] text-slate-500 mt-0.5">
+                  Select any photo from your files or gallery. It will be automatically optimized and saved.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-1">
+                {/* Native Device File Input */}
+                <input
+                  id="avatar-file-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+                <label
+                  htmlFor="avatar-file-upload"
+                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-sm cursor-pointer transition-all flex items-center space-x-1.5"
+                >
+                  <Upload className="w-3.5 h-3.5" />
+                  <span>Choose Photo from Device</span>
+                </label>
+
+                {formData.avatar && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFormData(prev => ({ 
+                        ...prev, 
+                        avatar: isFarmer ? AVATAR_PRESETS[0].url : AVATAR_PRESETS[3].url 
+                      }));
+                      setSuccessMsg("Reset to default preset avatar.");
+                    }}
+                    className="px-3 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-semibold rounded-xl transition-colors flex items-center space-x-1"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    <span>Reset to Preset</span>
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Preset Avatars as optional alternative */}
+          <div className="space-y-2 pt-1">
+            <p className="text-xs text-slate-500 font-medium">Or choose a pre-made avatar:</p>
+            <div className="flex flex-wrap gap-2.5">
               {AVATAR_PRESETS.map((preset, idx) => (
                 <button
                   key={idx}
                   type="button"
                   onClick={() => handleAvatarSelect(preset.url)}
-                  className={`flex items-center space-x-2 p-1.5 pr-3 rounded-2xl border transition-all ${
+                  className={`flex items-center space-x-2 p-1.5 pr-3 rounded-xl border transition-all ${
                     formData.avatar === preset.url
                       ? "border-emerald-600 bg-emerald-50 text-emerald-900 font-bold shadow-sm"
-                      : "border-slate-200 hover:border-slate-300 text-slate-700"
+                      : "border-slate-200 hover:border-slate-300 text-slate-700 bg-white"
                   }`}
                 >
-                  <img src={preset.url} alt={preset.label} className="w-8 h-8 rounded-xl object-cover" />
-                  <span className="text-xs">{preset.label}</span>
+                  <img src={preset.url} alt={preset.label} className="w-7 h-7 rounded-lg object-cover" />
+                  <span className="text-[11px]">{preset.label}</span>
                 </button>
               ))}
-            </div>
-
-            <div className="pt-2">
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Custom Image URL</label>
-              <input
-                type="url"
-                name="avatar"
-                value={formData.avatar}
-                onChange={handleChange}
-                placeholder="https://images.unsplash.com/..."
-                className="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono"
-              />
             </div>
           </div>
         </div>
