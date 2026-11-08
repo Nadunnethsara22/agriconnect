@@ -25,7 +25,7 @@ export default function AuthPage({
   initialRole = "farmer", 
   setInitialRole 
 }) {
-  const { login, register, loginWithGoogle, loginAsDemoAdmin, loading } = useAuth();
+  const { login, register, loginWithGoogle, loading } = useAuth();
   const [isRegister, setIsRegister] = useState(authMode === "register");
   const [selectedRole, setSelectedRole] = useState(initialRole || "farmer"); // "farmer", "buyer", or "admin"
   const [error, setError] = useState("");
@@ -425,36 +425,6 @@ export default function AuthPage({
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>
-
-          {/* Quick Demo Access Bar */}
-          {!isRegister && (
-            <div className="pt-2 border-t border-slate-100 space-y-2">
-              <p className="text-[11px] text-slate-400 text-center font-medium">Testing & Demo Accounts:</p>
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <button
-                  type="button"
-                  onClick={() => {
-                    loginAsDemoAdmin();
-                    setSuccessMsg("Signed in as Market Price Admin!");
-                    setTimeout(() => setActivePage("analytics"), 400);
-                  }}
-                  className="py-1.5 px-2 bg-purple-50 hover:bg-purple-100 text-purple-800 rounded-lg font-bold text-[11px] border border-purple-200 flex items-center justify-center space-x-1 transition-colors"
-                >
-                  <ShieldCheck className="w-3.5 h-3.5 text-purple-600" />
-                  <span>Admin Login (පරිපාලක)</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setFormData({ ...formData, email: "admin@agriconnect.lk", password: "password123" });
-                  }}
-                  className="py-1.5 px-2 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-lg font-medium text-[11px] border border-slate-200 transition-colors text-center"
-                >
-                  Auto-fill Admin Email
-                </button>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>
