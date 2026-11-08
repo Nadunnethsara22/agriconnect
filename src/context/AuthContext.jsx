@@ -135,7 +135,9 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     setLoading(true);
     try {
-      const { email, password, role, displayName, phone, district, farmName, businessName } = userData;
+      const { email, password, role, displayName, phone, district, farmName, businessName, location } = userData;
+
+      const derivedLocation = location || (farmName ? `${farmName}, ${district || 'Sri Lanka'}` : (district ? `${district}, Sri Lanka` : ""));
 
       let uid = "user_" + Date.now();
       if (isFirebaseConfigured && auth) {
@@ -147,8 +149,9 @@ export const AuthProvider = ({ children }) => {
             email,
             displayName,
             role,
-            phone,
-            district,
+            phone: phone || "",
+            district: district || "Colombo",
+            location: derivedLocation,
             farmName: farmName || "",
             businessName: businessName || "",
             createdAt: new Date().toISOString()
@@ -161,8 +164,9 @@ export const AuthProvider = ({ children }) => {
         email,
         displayName,
         role: role || "farmer",
-        phone: phone || "+94 77 123 4567",
-        district: district || "Nuwara Eliya",
+        phone: phone || "",
+        district: district || "Colombo",
+        location: derivedLocation,
         farmName: farmName || (role === "farmer" ? `${displayName}'s Farm` : ""),
         businessName: businessName || (role === "buyer" ? `${displayName} Wholesale` : ""),
         rating: 5.0,

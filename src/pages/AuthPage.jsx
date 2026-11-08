@@ -75,6 +75,7 @@ export default function AuthPage({
     displayName: "",
     phone: "",
     district: "Nuwara Eliya",
+    location: "",
     farmName: "",
     businessName: "",
     mainCrops: ""
@@ -343,29 +344,55 @@ export default function AuthPage({
                 </div>
 
                 {selectedRole === "farmer" ? (
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">Farm / Lands Name</label>
-                    <input
-                      type="text"
-                      name="farmName"
-                      value={formData.farmName}
-                      onChange={handleChange}
-                      placeholder="e.g. Kandapola Highland Farm"
-                      className="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none"
-                    />
-                  </div>
+                  <>
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">Farm / Lands Name</label>
+                      <input
+                        type="text"
+                        name="farmName"
+                        value={formData.farmName}
+                        onChange={handleChange}
+                        placeholder="e.g. Green Valley Highland Farm"
+                        className="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">Farm / Village Address (ගොවිපල පිහිටි ලිපිනය / ගම)</label>
+                      <input
+                        type="text"
+                        name="location"
+                        value={formData.location}
+                        onChange={handleChange}
+                        placeholder="e.g. Boralanda Village, Welimada"
+                        className="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                      />
+                    </div>
+                  </>
                 ) : (
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">Business / Company Name</label>
-                    <input
-                      type="text"
-                      name="businessName"
-                      value={formData.businessName}
-                      onChange={handleChange}
-                      placeholder="e.g. Colombo Wholesale & Supermarket"
-                      className="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none"
-                    />
-                  </div>
+                  <>
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">Business / Company Name</label>
+                      <input
+                        type="text"
+                        name="businessName"
+                        value={formData.businessName}
+                        onChange={handleChange}
+                        placeholder="e.g. Colombo Wholesale & Supermarket"
+                        className="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">Business / Warehouse Location</label>
+                      <input
+                        type="text"
+                        name="location"
+                        value={formData.location}
+                        onChange={handleChange}
+                        placeholder="e.g. Peliyagoda Wholesale Market, Kelaniya"
+                        className="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                      />
+                    </div>
+                  </>
                 )}
               </>
             )}

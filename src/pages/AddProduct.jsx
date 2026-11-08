@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { 
   Sprout, 
   Upload, 
@@ -44,14 +44,26 @@ export default function AddProduct({ setActivePage }) {
     stockKg: "",
     minOrderKg: "25",
     unit: "kg",
-    district: user?.district || "Nuwara Eliya",
-    location: user?.location || "Kandapola Farm, Nuwara Eliya",
+    district: user?.district || "Colombo",
+    location: user?.location || (user?.farmName ? `${user.farmName}, ${user.district || 'Sri Lanka'}` : (user?.district ? `${user.district}, Sri Lanka` : "")),
     harvestDate: new Date().toISOString().split('T')[0],
     isOrganic: false,
     description: "",
     image: SAMPLE_IMAGE_PRESETS[0].url,
-    farmerPhone: user?.phone || "+94 77 345 6789"
+    farmerPhone: user?.phone || ""
   });
+
+  // Sync with actual registered user profile details once loaded
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        district: user.district || prev.district || "Colombo",
+        location: user.location || (user.farmName ? `${user.farmName}, ${user.district || 'Sri Lanka'}` : (user.district ? `${user.district}, Sri Lanka` : prev.location)),
+        farmerPhone: user.phone || prev.farmerPhone || ""
+      }));
+    }
+  }, [user]);
 
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -315,7 +327,7 @@ export default function AddProduct({ setActivePage }) {
                   name="location"
                   value={formData.location}
                   onChange={handleChange}
-                  placeholder="e.g. Kandapola Village, Nuwara Eliya"
+                  placeholder="e.g. Village, Town, or Farm Address"
                   className="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none"
                 />
               </div>
