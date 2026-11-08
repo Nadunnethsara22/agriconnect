@@ -42,11 +42,41 @@ export default function AuthPage({
     }
   }, [initialRole]);
 
+  const emptyForm = {
+    email: "",
+    password: "",
+    displayName: "",
+    phone: "",
+    district: "Nuwara Eliya",
+    location: "",
+    farmName: "",
+    businessName: "",
+    mainCrops: ""
+  };
+
+  const [formData, setFormData] = useState(emptyForm);
+
   const switchTab = (toRegister) => {
     setIsRegister(toRegister);
     if (setAuthMode) {
       setAuthMode(toRegister ? "register" : "login");
     }
+    // Clean all inputs so previous entries do not pop up or linger
+    setFormData(emptyForm);
+    setError("");
+    setSuccessMsg("");
+  };
+
+  const handleRoleSelect = (role) => {
+    setSelectedRole(role);
+    // Clear role-specific fields when switching role so previous user data doesn't linger
+    setFormData(prev => ({
+      ...prev,
+      farmName: "",
+      businessName: "",
+      location: "",
+      mainCrops: ""
+    }));
     setError("");
   };
 
@@ -68,18 +98,6 @@ export default function AuthPage({
       setError(res.error || "Google sign-in failed.");
     }
   };
-
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    displayName: "",
-    phone: "",
-    district: "Nuwara Eliya",
-    location: "",
-    farmName: "",
-    businessName: "",
-    mainCrops: ""
-  });
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -206,7 +224,7 @@ export default function AuthPage({
             <div className="grid grid-cols-3 gap-2">
               <button
                 type="button"
-                onClick={() => setSelectedRole("farmer")}
+                onClick={() => handleRoleSelect("farmer")}
                 className={`p-2.5 rounded-xl border-2 transition-all flex flex-col items-center text-center space-y-1 ${
                   selectedRole === "farmer"
                     ? "border-emerald-600 bg-emerald-50 text-emerald-900 shadow-sm ring-2 ring-emerald-500/20 font-bold"
@@ -222,7 +240,7 @@ export default function AuthPage({
 
               <button
                 type="button"
-                onClick={() => setSelectedRole("buyer")}
+                onClick={() => handleRoleSelect("buyer")}
                 className={`p-2.5 rounded-xl border-2 transition-all flex flex-col items-center text-center space-y-1 ${
                   selectedRole === "buyer"
                     ? "border-amber-600 bg-amber-50 text-amber-900 shadow-sm ring-2 ring-amber-500/20 font-bold"
@@ -238,7 +256,7 @@ export default function AuthPage({
 
               <button
                 type="button"
-                onClick={() => setSelectedRole("admin")}
+                onClick={() => handleRoleSelect("admin")}
                 className={`p-2.5 rounded-xl border-2 transition-all flex flex-col items-center text-center space-y-1 ${
                   selectedRole === "admin"
                     ? "border-purple-600 bg-purple-50 text-purple-900 shadow-sm ring-2 ring-purple-500/20 font-bold"
@@ -322,7 +340,7 @@ export default function AuthPage({
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
             {isRegister && (
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">Full Name</label>
@@ -335,6 +353,7 @@ export default function AuthPage({
                     onChange={handleChange}
                     placeholder={selectedRole === "farmer" ? "e.g. Sunil Bandara" : "e.g. Priyantha Silva"}
                     className="w-full pl-9 pr-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                    autoComplete="off"
                     required
                   />
                 </div>
@@ -358,6 +377,7 @@ export default function AuthPage({
                       : "buyer@example.com"
                   }
                   className="w-full pl-9 pr-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                  autoComplete="off"
                   required
                 />
               </div>
@@ -374,6 +394,7 @@ export default function AuthPage({
                   onChange={handleChange}
                   placeholder="••••••••"
                   className="w-full pl-9 pr-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                  autoComplete="new-password"
                   required
                 />
               </div>
@@ -405,6 +426,7 @@ export default function AuthPage({
                       onChange={handleChange}
                       placeholder="+94 77 123 4567"
                       className="w-full px-2.5 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                      autoComplete="off"
                     />
                   </div>
                 </div>
@@ -420,6 +442,7 @@ export default function AuthPage({
                         onChange={handleChange}
                         placeholder="e.g. Green Valley Highland Farm"
                         className="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                        autoComplete="off"
                       />
                     </div>
                     <div>
@@ -431,6 +454,7 @@ export default function AuthPage({
                         onChange={handleChange}
                         placeholder="e.g. Boralanda Village, Welimada"
                         className="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                        autoComplete="off"
                       />
                     </div>
                   </>
@@ -445,6 +469,7 @@ export default function AuthPage({
                         onChange={handleChange}
                         placeholder="e.g. Colombo Wholesale & Supermarket"
                         className="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                        autoComplete="off"
                       />
                     </div>
                     <div>
@@ -456,6 +481,7 @@ export default function AuthPage({
                         onChange={handleChange}
                         placeholder="e.g. Peliyagoda Wholesale Market, Kelaniya"
                         className="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                        autoComplete="off"
                       />
                     </div>
                   </>

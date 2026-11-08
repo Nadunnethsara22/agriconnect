@@ -38,14 +38,14 @@ export default function FarmerDashboard({ setActivePage, setSelectedProduct }) {
   const [editPrice, setEditPrice] = useState("");
   const [editStock, setEditStock] = useState("");
 
-  // Filter products for this farmer (Sunil Bandara or currently logged in farmer)
+  // Filter products for this farmer (strictly for the logged in farmer, no mock leakage)
   const myProducts = products.filter(
-    p => p.farmerId === user?.uid || p.farmerId === "farmer-1" || (!user?.uid && p.farmerId === "farmer-1")
+    p => user?.uid ? (p.farmerId === user.uid || (user.email && p.farmerEmail === user.email)) : false
   );
 
-  // Filter purchase requests for this farmer
+  // Filter purchase requests for this farmer (strictly for the logged in farmer, no mock leakage)
   const myRequests = buyerRequests.filter(
-    r => r.farmerId === user?.uid || r.farmerId === "farmer-1" || (!user?.uid && r.farmerId === "farmer-1")
+    r => user?.uid ? (r.farmerId === user.uid || (user.email && r.farmerEmail === user.email)) : false
   );
 
   // Quick statistics

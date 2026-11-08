@@ -79,17 +79,13 @@ export default function BuyerRequests({ setActivePage }) {
     }
   }, [isFarmer, activeTab]);
 
-  // Filter requests
+  // Filter requests strictly for the logged in user (no mock data leakage to new accounts)
   const mySentRequests = buyerRequests.filter(
-    r => r.buyerId === user?.uid || 
-         r.buyerId === "buyer-1" || 
-         (!user?.uid && r.buyerId === "buyer-1") ||
-         (user?.email && r.buyerEmail === user.email) ||
-         (user?.displayName && r.buyerName?.toLowerCase() === user.displayName?.toLowerCase())
+    r => user?.uid ? (r.buyerId === user.uid || (user.email && r.buyerEmail === user.email)) : false
   );
 
   const receivedRequests = buyerRequests.filter(
-    r => r.farmerId === user?.uid || r.farmerId === "farmer-1" || (!user?.uid && r.farmerId === "farmer-1")
+    r => user?.uid ? (r.farmerId === user.uid || (user.email && r.farmerEmail === user.email)) : false
   );
 
   const handleSelectProductForOrder = (productId) => {

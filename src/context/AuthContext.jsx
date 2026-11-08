@@ -65,14 +65,14 @@ export const AuthProvider = ({ children }) => {
               return;
             }
           }
-          setUser((prev) => ({
+          setUser({
             uid: firebaseUser.uid,
             email: firebaseUser.email,
-            displayName: firebaseUser.displayName || prev?.displayName || "AgriConnect User",
-            role: prev?.role || "farmer",
-            phone: prev?.phone || "+94 77 123 4567",
-            district: prev?.district || "Nuwara Eliya"
-          }));
+            displayName: firebaseUser.displayName || firebaseUser.email?.split("@")[0] || "User",
+            role: "farmer",
+            phone: firebaseUser.phoneNumber || "",
+            district: "Colombo"
+          });
         } catch (err) {
           console.error("Error fetching user profile from firestore:", err);
         }
@@ -109,18 +109,18 @@ export const AuthProvider = ({ children }) => {
         setUser(loggedUser);
         return { success: true, user: loggedUser };
       } else {
-        // Fallback local auth simulation
+        // Fallback local auth simulation (create clean isolated user, do not clone mock demo profile)
         const isAdmin = email.toLowerCase().includes("admin") || preferredRole === "admin";
         const isFarmer = preferredRole === "farmer" || (email.toLowerCase().includes("farmer") && preferredRole !== "buyer");
-        let baseUser;
-        if (isAdmin) {
-          baseUser = { ...DEMO_USERS.admin };
-        } else if (isFarmer) {
-          baseUser = { ...DEMO_USERS.farmer };
-        } else {
-          baseUser = { ...DEMO_USERS.buyer };
-        }
-        baseUser.email = email;
+        const detectedRole = isAdmin ? "admin" : isFarmer ? "farmer" : "buyer";
+        const baseUser = {
+          uid: "user_" + Date.now(),
+          email,
+          displayName: email.split("@")[0] || (isAdmin ? "Market Price Admin" : isFarmer ? "Farmer" : "Buyer"),
+          role: detectedRole,
+          district: "Colombo",
+          phone: "+94 77 000 0000"
+        };
         setUser(baseUser);
         return { success: true, user: baseUser };
       }

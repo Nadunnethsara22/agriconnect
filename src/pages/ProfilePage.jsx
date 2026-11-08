@@ -84,9 +84,9 @@ export default function ProfilePage({ setActivePage }) {
     );
   }
 
-  // Related stats
-  const farmerCropCount = products.filter(p => p.farmerId === user.uid || p.farmerId === "farmer-1").length;
-  const buyerOrdersCount = buyerRequests.filter(r => r.buyerId === user.uid || r.buyerId === "buyer-1").length;
+  // Related stats strictly for logged in user
+  const farmerCropCount = products.filter(p => p.farmerId === user.uid).length;
+  const buyerOrdersCount = buyerRequests.filter(r => r.buyerId === user.uid).length;
 
   const handleChange = (e) => {
     const { name, value } = e.target;

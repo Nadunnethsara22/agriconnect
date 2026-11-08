@@ -390,10 +390,10 @@ export const MarketplaceProvider = ({ children }) => {
     localStorage.removeItem("agriconnect_economic_prices");
   };
 
-  // Filter helpers
-  const farmerProducts = products.filter(p => p.farmerId === user?.uid || (!user?.uid && p.farmerId === "farmer-1"));
-  const farmerRequests = buyerRequests.filter(r => r.farmerId === user?.uid || (!user?.uid && r.farmerId === "farmer-1"));
-  const buyerSentRequests = buyerRequests.filter(r => r.buyerId === user?.uid || (!user?.uid && r.buyerId === "buyer-1"));
+  // Filter helpers (strictly for logged-in user)
+  const farmerProducts = products.filter(p => user?.uid ? p.farmerId === user.uid : false);
+  const farmerRequests = buyerRequests.filter(r => user?.uid ? r.farmerId === user.uid : false);
+  const buyerSentRequests = buyerRequests.filter(r => user?.uid ? r.buyerId === user.uid : false);
 
   // Pending count for badges
   const pendingRequestsCount = user?.role === "farmer" 
