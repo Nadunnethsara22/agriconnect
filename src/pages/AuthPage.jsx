@@ -120,13 +120,14 @@ export default function AuthPage({
         setError(res.error || "Failed to register.");
       }
     } else {
-      const res = await login(formData.email, formData.password);
+      const res = await login(formData.email, formData.password, selectedRole);
       if (res.success) {
-        setSuccessMsg("Welcome back!");
+        setSuccessMsg(`Welcome back! Signed in as ${res.user?.role || selectedRole}`);
         setTimeout(() => {
-          if (res.user?.role === "admin" || res.user?.email?.toLowerCase().includes("admin")) {
+          const effectiveRole = res.user?.role || selectedRole;
+          if (effectiveRole === "admin" || res.user?.email?.toLowerCase().includes("admin")) {
             setActivePage("analytics");
-          } else if (res.user?.role === "farmer") {
+          } else if (effectiveRole === "farmer") {
             setActivePage("farmer-dashboard");
           } else {
             setActivePage("marketplace");
@@ -167,7 +168,7 @@ export default function AuthPage({
                 !isRegister ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-800"
               }`}
             >
-              Sign In
+              Sign In (ඇතුල් වන්න)
             </button>
             <button
               type="button"
@@ -176,9 +177,113 @@ export default function AuthPage({
                 isRegister ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-800"
               }`}
             >
-              Register New
+              Register New (ලියාපදිංචි වන්න)
             </button>
           </div>
+
+          {/* Role Selector (Prominently visible for BOTH Sign In & Register) */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="block text-xs font-bold text-slate-700">
+                {isRegister ? "Select Account Type (ගිණුම් වර්ගය):" : "Signing In As (ඔබගේ භූමිකාව තෝරන්න):"}
+              </label>
+              <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center space-x-1.5 shadow-sm ${
+                selectedRole === "admin"
+                  ? "bg-purple-100 text-purple-800 border border-purple-200"
+                  : selectedRole === "farmer"
+                  ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
+                  : "bg-amber-100 text-amber-800 border border-amber-200"
+              }`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${
+                  selectedRole === "admin" ? "bg-purple-600 animate-pulse" : selectedRole === "farmer" ? "bg-emerald-600 animate-pulse" : "bg-amber-600 animate-pulse"
+                }`} />
+                <span>
+                  {selectedRole === "admin" ? "Admin (පරිපාලක)" : selectedRole === "farmer" ? "Farmer (ගොවි)" : "Buyer (ගැනුම්කරු)"}
+                </span>
+              </span>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2">
+              <button
+                type="button"
+                onClick={() => setSelectedRole("farmer")}
+                className={`p-2.5 rounded-xl border-2 transition-all flex flex-col items-center text-center space-y-1 ${
+                  selectedRole === "farmer"
+                    ? "border-emerald-600 bg-emerald-50 text-emerald-900 shadow-sm ring-2 ring-emerald-500/20 font-bold"
+                    : "border-slate-200 hover:border-slate-300 text-slate-600 bg-slate-50/50"
+                }`}
+              >
+                <Sprout className={`w-5 h-5 ${selectedRole === "farmer" ? "text-emerald-600" : "text-slate-400"}`} />
+                <span className="text-[11px] font-bold">Farmer (ගොවි)</span>
+                <span className="text-[9px] text-slate-500 leading-tight">
+                  {isRegister ? "Sell harvest" : "Manage harvest"}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setSelectedRole("buyer")}
+                className={`p-2.5 rounded-xl border-2 transition-all flex flex-col items-center text-center space-y-1 ${
+                  selectedRole === "buyer"
+                    ? "border-amber-600 bg-amber-50 text-amber-900 shadow-sm ring-2 ring-amber-500/20 font-bold"
+                    : "border-slate-200 hover:border-slate-300 text-slate-600 bg-slate-50/50"
+                }`}
+              >
+                <ShoppingBag className={`w-5 h-5 ${selectedRole === "buyer" ? "text-amber-600" : "text-slate-400"}`} />
+                <span className="text-[11px] font-bold">Buyer (ගැනුම්කරු)</span>
+                <span className="text-[9px] text-slate-500 leading-tight">
+                  {isRegister ? "Wholesale" : "Buy crops"}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setSelectedRole("admin")}
+                className={`p-2.5 rounded-xl border-2 transition-all flex flex-col items-center text-center space-y-1 ${
+                  selectedRole === "admin"
+                    ? "border-purple-600 bg-purple-50 text-purple-900 shadow-sm ring-2 ring-purple-500/20 font-bold"
+                    : "border-slate-200 hover:border-slate-300 text-slate-600 bg-slate-50/50"
+                }`}
+              >
+                <ShieldCheck className={`w-5 h-5 ${selectedRole === "admin" ? "text-purple-600" : "text-slate-400"}`} />
+                <span className="text-[11px] font-bold">Admin (පරිපාලක)</span>
+                <span className="text-[9px] text-slate-500 leading-tight">Price trends</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Role Status Helper Message */}
+          {selectedRole === "admin" ? (
+            <div className="p-2.5 bg-purple-50 rounded-xl border border-purple-200 text-xs text-purple-900 flex items-center space-x-2 animate-fade-in">
+              <ShieldCheck className="w-4 h-4 text-purple-600 flex-shrink-0" />
+              <p className="text-[11px] text-purple-800 leading-tight">
+                <strong>Market Price Administrator: </strong>
+                {isRegister
+                  ? "Admins manage nationwide wholesale price benchmarks. Farm/company details not required."
+                  : "Access daily market price updates and commodity trend analytics."}
+              </p>
+            </div>
+          ) : selectedRole === "farmer" ? (
+            <div className="p-2 bg-emerald-50 rounded-xl border border-emerald-200 text-xs text-emerald-900 flex items-center space-x-2 animate-fade-in">
+              <Sprout className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+              <p className="text-[11px] text-emerald-800 leading-tight">
+                <strong>Farmer Portal (ගොවි පිවිසුම): </strong>
+                {isRegister
+                  ? "Register your farm to sell crops directly to wholesale and retail buyers."
+                  : "Sign in to update harvest listings and respond to purchase orders."}
+              </p>
+            </div>
+          ) : (
+            <div className="p-2 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-900 flex items-center space-x-2 animate-fade-in">
+              <ShoppingBag className="w-4 h-4 text-amber-600 flex-shrink-0" />
+              <p className="text-[11px] text-amber-800 leading-tight">
+                <strong>Buyer Portal (ගැනුම්කරු පිවිසුම): </strong>
+                {isRegister
+                  ? "Register as a wholesale buyer, supermarket, exporter, or retailer."
+                  : "Sign in to browse farm listings and post buying requirements."}
+              </p>
+            </div>
+          )}
 
           {/* Quick Google Sign In */}
           <button
@@ -192,7 +297,9 @@ export default function AuthPage({
               <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
               <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
             </svg>
-            <span>Continue with Google</span>
+            <span>
+              Continue with Google as {selectedRole === "admin" ? "Admin (පරිපාලක)" : selectedRole === "farmer" ? "Farmer (ගොවි)" : "Buyer (ගැනුම්කරු)"}
+            </span>
           </button>
 
           <div className="relative flex py-1 items-center">
@@ -216,53 +323,6 @@ export default function AuthPage({
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Role Selector (visible in Register mode) */}
-            {isRegister && (
-              <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-slate-700">Select Your Account Type</label>
-                <div className="grid grid-cols-3 gap-2">
-                  <div
-                    onClick={() => setSelectedRole("farmer")}
-                    className={`p-2.5 rounded-xl border-2 cursor-pointer transition-all flex flex-col items-center text-center space-y-1 ${
-                      selectedRole === "farmer"
-                        ? "border-emerald-600 bg-emerald-50 text-emerald-800"
-                        : "border-slate-200 hover:border-slate-300 text-slate-600"
-                    }`}
-                  >
-                    <Sprout className="w-5 h-5 text-emerald-600" />
-                    <span className="text-[11px] font-bold">Farmer (ගොවි)</span>
-                    <span className="text-[9px] text-slate-500">Sell harvest</span>
-                  </div>
-
-                  <div
-                    onClick={() => setSelectedRole("buyer")}
-                    className={`p-2.5 rounded-xl border-2 cursor-pointer transition-all flex flex-col items-center text-center space-y-1 ${
-                      selectedRole === "buyer"
-                        ? "border-amber-600 bg-amber-50 text-amber-800"
-                        : "border-slate-200 hover:border-slate-300 text-slate-600"
-                    }`}
-                  >
-                    <ShoppingBag className="w-5 h-5 text-amber-600" />
-                    <span className="text-[11px] font-bold">Buyer (ගැනුම්කරු)</span>
-                    <span className="text-[9px] text-slate-500">Wholesale</span>
-                  </div>
-
-                  <div
-                    onClick={() => setSelectedRole("admin")}
-                    className={`p-2.5 rounded-xl border-2 cursor-pointer transition-all flex flex-col items-center text-center space-y-1 ${
-                      selectedRole === "admin"
-                        ? "border-purple-600 bg-purple-50 text-purple-800 font-bold"
-                        : "border-slate-200 hover:border-slate-300 text-slate-600"
-                    }`}
-                  >
-                    <ShieldCheck className="w-5 h-5 text-purple-600" />
-                    <span className="text-[11px] font-bold">Admin (පරිපාලක)</span>
-                    <span className="text-[9px] text-slate-500">Update Prices</span>
-                  </div>
-                </div>
-              </div>
-            )}
-
             {isRegister && (
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">Full Name</label>
@@ -290,7 +350,13 @@ export default function AuthPage({
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder="your.email@example.com"
+                  placeholder={
+                    selectedRole === "admin"
+                      ? "admin@agriconnect.lk"
+                      : selectedRole === "farmer"
+                      ? "farmer@example.com"
+                      : "buyer@example.com"
+                  }
                   className="w-full pl-9 pr-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none"
                   required
                 />
@@ -397,19 +463,6 @@ export default function AuthPage({
               </>
             )}
 
-            {/* Informational banner when Admin role is selected */}
-            {isRegister && selectedRole === "admin" && (
-              <div className="p-3 bg-purple-50 rounded-xl border border-purple-200 text-xs text-purple-900 space-y-1 animate-fade-in">
-                <p className="font-bold flex items-center space-x-1.5 text-purple-800">
-                  <ShieldCheck className="w-4 h-4 text-purple-600 flex-shrink-0" />
-                  <span>Market Price Administrator</span>
-                </p>
-                <p className="text-[11px] text-purple-700 leading-relaxed">
-                  Admins manage nationwide wholesale price benchmarks. District, farm, or company details are not required.
-                </p>
-              </div>
-            )}
-
             <button
               type="submit"
               disabled={loading}
@@ -421,7 +474,21 @@ export default function AuthPage({
                   : "bg-amber-600 hover:bg-amber-700"
               }`}
             >
-              <span>{loading ? "Processing..." : isRegister ? "Create Account" : "Sign In to AgriConnect"}</span>
+              <span>
+                {loading
+                  ? "Processing..."
+                  : isRegister
+                  ? selectedRole === "admin"
+                    ? "Create Admin Account (පරිපාලක ලියාපදිංචිය)"
+                    : selectedRole === "farmer"
+                    ? "Create Farmer Account (ගොවි ලියාපදිංචිය)"
+                    : "Create Buyer Account (ගැනුම්කරු ලියාපදිංචිය)"
+                  : selectedRole === "admin"
+                  ? "Sign In as Admin (පරිපාලක පිවිසුම)"
+                  : selectedRole === "farmer"
+                  ? "Sign In as Farmer (ගොවි පිවිසුම)"
+                  : "Sign In as Buyer (ගැනුම්කරු පිවිසුම)"}
+              </span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>

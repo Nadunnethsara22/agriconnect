@@ -82,7 +82,7 @@ export const AuthProvider = ({ children }) => {
     return () => unsubscribe();
   }, []);
 
-  const login = async (email, password) => {
+  const login = async (email, password, preferredRole = "farmer") => {
     setLoading(true);
     try {
       if (isFirebaseConfigured && auth) {
@@ -94,8 +94,8 @@ export const AuthProvider = ({ children }) => {
             profile = snap.data();
           }
         }
-        const isAdminEmail = email.toLowerCase().includes("admin");
-        const detectedRole = profile?.role || (isAdminEmail ? "admin" : "farmer");
+        const isAdminEmail = email.toLowerCase().includes("admin") || preferredRole === "admin";
+        const detectedRole = profile?.role || (isAdminEmail ? "admin" : (preferredRole || "farmer"));
 
         const loggedUser = {
           uid: userCred.user.uid,
@@ -110,8 +110,8 @@ export const AuthProvider = ({ children }) => {
         return { success: true, user: loggedUser };
       } else {
         // Fallback local auth simulation
-        const isAdmin = email.toLowerCase().includes("admin");
-        const isFarmer = email.toLowerCase().includes("farmer");
+        const isAdmin = email.toLowerCase().includes("admin") || preferredRole === "admin";
+        const isFarmer = preferredRole === "farmer" || (email.toLowerCase().includes("farmer") && preferredRole !== "buyer");
         let baseUser;
         if (isAdmin) {
           baseUser = { ...DEMO_USERS.admin };
