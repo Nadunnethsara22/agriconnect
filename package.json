@@ -2,11 +2,14 @@
   "name": "agriconnect-srilanka",
   "private": true,
   "version": "1.0.0",
+  "homepage": "https://nadunnethsara22.github.io/agriconnect",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "firebase": "^12.18.0",
@@ -17,6 +20,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^6.1.0",
+    "gh-pages": "^6.3.0",
     "vite": "^8.2.2"
   }
 }
